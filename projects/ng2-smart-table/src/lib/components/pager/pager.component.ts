@@ -49,12 +49,17 @@ import { DataSourceClass } from '../../lib/data-source/data-source.class';
 				</li>
 			</ul>
 		</nav>
-		<nav *ngIf="perPageSelect && perPageSelect.length > 0" class="ng2-smart-pagination-per-page">
+		<nav *ngIf="perPageSelect && perPageSelect.length" class="ng2-smart-pagination-per-page">
 			<label for="per-page">
 				Per Page:
 			</label>
-			<select (change)="onChangePerPage($event)" [(ngModel)]="currentPerPage" id="per-page">
-				<option *ngFor="let item of perPageSelect" [value]="item">{{ item }}</option>
+			<select (change)="onChangePerPage($event)"
+			        [(ngModel)]="currentPerPage"
+			        id="per-page">
+				<option *ngFor="let item of perPageSelect"
+				        [value]="item">
+					{{ item }}
+				</option>
 			</select>
 		</nav>
   `
@@ -166,13 +171,8 @@ export class PagerComponent implements OnChanges {
 
   onChangePerPage(event: any) {
     if (this.currentPerPage) {
-
-      if (typeof this.currentPerPage === 'string' && this.currentPerPage.toLowerCase() === 'all') {
-        this.source.getPaging().perPage = null;
-      } else {
-        this.source.getPaging().perPage = this.currentPerPage * 1;
-        this.source.refresh();
-      }
+      this.source.getPaging().perPage = this.currentPerPage ? this.currentPerPage : null;
+      this.source.refresh();
       this.initPages();
     }
   }

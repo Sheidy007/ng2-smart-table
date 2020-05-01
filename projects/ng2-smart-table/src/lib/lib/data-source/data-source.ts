@@ -49,9 +49,15 @@ export abstract class DataSource {
     return Promise.resolve();
   }
 
-  update(element: any, values: any): Promise<any> {
+  update(element: any, value: any): Promise<any> {
     this.emitOnUpdated(element);
     this.emitOnChanged('update');
+    return Promise.resolve();
+  }
+
+  updateField(element: any, field: string, value: any): Promise<any> {
+    this.emitOnUpdated(element);
+    this.emitOnChanged('updateField');
     return Promise.resolve();
   }
 

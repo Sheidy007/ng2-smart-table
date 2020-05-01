@@ -57,7 +57,7 @@ export class TitleComponent implements OnChanges {
         direction: this.currentDirection,
         compare: this.column.getCompareFunction()
       }
-    ]);
+    ], true, this.column.multiCompare);
     this.sort.emit(null);
   }
 

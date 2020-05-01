@@ -27,14 +27,14 @@ export class AddButtonComponent implements AfterViewInit, OnChanges {
   }
 
   ngOnChanges() {
-    this.isActionAdd = this.grid.getSetting('actions.add');
-    this.addNewButtonContent = this.grid.getSetting('add.addButtonContent');
+    this.isActionAdd = this.grid.getSetting().actions.add;
+    this.addNewButtonContent = this.grid.getSetting().add.addButtonContent;
   }
 
   onAdd(event: any) {
     event.preventDefault();
     event.stopPropagation();
-    if (this.grid.getSetting('mode') === 'external') {
+    if (this.grid.getSetting().mode === 'external') {
       this.create.emit({
         source: this.source,
       });

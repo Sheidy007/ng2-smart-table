@@ -1,6 +1,5 @@
 import { Row } from './row';
 import { Column } from './column';
-import { SettingsClass } from '../settings.class';
 
 export class DataSet {
 
@@ -10,7 +9,7 @@ export class DataSet {
   protected columns: Column[] = [];
   protected rows: Row[] = [];
   protected selectedRow: Row;
-  protected willSelect = 'first';
+  protected needSelect: 'first' | 'last' | '' = 'first';
 
   constructor(data: Array<any> = [], protected columnSettings: any) {
     this.createColumns(columnSettings);
@@ -18,16 +17,40 @@ export class DataSet {
     this.createNewRow();
   }
 
+  // create
+
+  createColumns(columnsSettings: any) {
+    for (const id in columnsSettings) {
+      if (columnsSettings.hasOwnProperty(id)) {
+        this.columns.push(new Column(id, columnsSettings[id], this));
+      }
+    }
+  }
+
   setData(data: Array<any>) {
     this.data = data;
     this.createRows();
   }
 
-  getColumns(): Array<Column> {
+  createRows() {
+    this.rows = [];
+    this.data.forEach((el, index) => {
+      this.rows.push(new Row(index, el, this));
+    });
+  }
+
+  createNewRow() {
+    this.newRow = new Row(-1, {}, this);
+    this.newRow.isInEditing = true;
+  }
+
+  // get
+
+  getColumns(): Column[] {
     return this.columns;
   }
 
-  getRows(): Array<Row> {
+  getRows(): Row[] {
     return this.rows;
   }
 
@@ -43,105 +66,72 @@ export class DataSet {
     return this.rows.find((row: Row) => row.getData() === data);
   }
 
-  deselectAll() {
-    this.rows.forEach((row) => {
-      row.isSelected = false;
-    });
-  }
+  // actions
 
-  selectRow(row: Row): Row {
-    const previousIsSelected = row.isSelected;
-    this.deselectAll();
-
-    row.isSelected = !previousIsSelected;
-    this.selectedRow = row;
-
-    return this.selectedRow;
+  select(): Row {
+    if (!this.getRows()) {return; }
+    if (!this.needSelect || this.needSelect === 'first') {
+      this.needSelect = '';
+      return this.selectFirstRow();
+    } else {
+      this.needSelect = '';
+      return this.selectLastRow();
+    }
   }
 
   multipleSelectRow(row: Row): Row {
     row.isSelected = !row.isSelected;
     this.selectedRow = row;
-
     return this.selectedRow;
   }
 
   selectPreviousRow(): Row {
-    if (this.rows.length > 0) {
+    if (this.rows.length) {
       let index = this.selectedRow ? this.selectedRow.index : 0;
       if (index > this.rows.length - 1) {
         index = this.rows.length - 1;
       }
-      this.selectRow(this.rows[index]);
-      return this.selectedRow;
+      return this.reverseSelectedFlagOnRow(this.rows[index]);
     }
   }
 
   selectFirstRow(): Row {
-    if (this.rows.length > 0) {
-      this.selectRow(this.rows[0]);
-      return this.selectedRow;
+    if (this.rows.length) {
+      return this.reverseSelectedFlagOnRow(this.rows[0]);
     }
   }
 
   selectLastRow(): Row {
-    if (this.rows.length > 0) {
-      this.selectRow(this.rows[this.rows.length - 1]);
-      return this.selectedRow;
+    if (this.rows.length) {
+      return this.reverseSelectedFlagOnRow(this.rows[this.rows.length - 1]);
     }
   }
 
-  willSelectFirstRow() {
-    this.willSelect = 'first';
-  }
-
-  willSelectLastRow() {
-    this.willSelect = 'last';
-  }
-
-  select(): Row {
-    if (this.getRows().length === 0) {
-      return;
-    }
-    if (this.willSelect) {
-      if (this.willSelect === 'first') {
-        this.selectFirstRow();
-      }
-      if (this.willSelect === 'last') {
-        this.selectLastRow();
-      }
-      this.willSelect = '';
-    } else {
-      this.selectFirstRow();
-    }
-
+  reverseSelectedFlagOnRow(row: Row): Row {
+    this.deselectAllByRow(row);
+    this.selectedRow = row.isSelected ? row : null;
     return this.selectedRow;
   }
 
-  createNewRow() {
-    this.newRow = new Row(-1, {}, this);
-    this.newRow.isInEditing = true;
+  selectRow(row: Row): Row {
+    this.deselectAllByRow();
+    row.isSelected = true;
+    this.selectedRow = row;
+    return this.selectedRow;
   }
 
-  /**
-   * Create columns by mapping from the settings
-   * @param columnsSettings  contain columnsSettings
-   */
-  createColumns(columnsSettings: any) {
-    for (const id in columnsSettings) {
-      if (columnsSettings.hasOwnProperty(id)) {
-        this.columns.push(new Column(id, columnsSettings[id], this));
-      }
-    }
-  }
-
-  /**
-   * Create rows based on current data prepared in data source
-   */
-  createRows() {
-    this.rows = [];
-    this.data.forEach((el, index) => {
-      this.rows.push(new Row(index, el, this));
+  deselectAllByRow(useRow?) {
+    this.rows.forEach((row) => {
+      row.isSelected = useRow && useRow === row ? !row.isSelected : false;
     });
   }
+
+  willSelectFirstRow() {
+    this.needSelect = 'first';
+  }
+
+  willSelectLastRow() {
+    this.needSelect = 'last';
+  }
+
 }

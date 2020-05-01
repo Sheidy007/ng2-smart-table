@@ -140,7 +140,6 @@ export class Ng2SmartTableComponent implements OnChanges {
 
   private emitUserSelectRow(row: Row) {
     const selectedRows = this.grid.getSelectedRows();
-
     this.userRowSelect.emit({
       data: row ? row.getData() : null,
       isSelected: row ? row.getIsSelected() : null,

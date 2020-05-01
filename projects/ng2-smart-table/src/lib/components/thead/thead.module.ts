@@ -12,7 +12,7 @@ import { AddButtonComponent } from './cells/add-button.component';
 import { CheckboxSelectAllComponent } from './cells/checkbox-select-all.component';
 import { ColumnTitleComponent } from './cells/column-title.component';
 import { TitleComponent } from './cells/title/title.component';
-import { TheadFitlersRowComponent } from './rows/thead-filters-row.component';
+import { TheadFiltersRowComponent } from './rows/thead-filters-row.component';
 import { TheadFormRowComponent } from './rows/thead-form-row.component';
 import { TheadTitlesRowComponent } from './rows/thead-titles-row.component';
 
@@ -23,7 +23,7 @@ const THEAD_COMPONENTS = [
   CheckboxSelectAllComponent,
   ColumnTitleComponent,
   TitleComponent,
-  TheadFitlersRowComponent,
+  TheadFiltersRowComponent,
   TheadFormRowComponent,
   TheadTitlesRowComponent,
   Ng2SmartTableTheadComponent,

@@ -9,17 +9,22 @@ export class Column {
   class = '';
   width = '';
   sort = false;
+  multiCompare = false;
+  defaultSortDirection: 'desc' | 'asc' | '' = '';
   editable = true;
   addable = true;
-  defaultSortDirection: 'desc' | 'asc' | '' = '';
   editor: { type: string, config: any, component: any }
     = { type: '', config: {}, component: null };
+
   filter: { type: 'custom' | 'default', config: FilterConfigClass, component: any }
     = { type: 'default', config: new FilterConfigClass(), component: null };
+
   renderComponent: any = null;
+
   compareFunction: () => number = null;
   valuePrepareFunction: () => any = null;
   filterFunction: () => boolean = null;
+
   onComponentInitFunction: () => ViewCell = null;
 
   constructor(public id: string, protected columnSettings: Column, protected dataSet: DataSet) {
@@ -62,6 +67,7 @@ export class Column {
       , 'editor'
       , 'filter'
       , 'sort'
+      , 'multiCompare'
       , 'editable'
       , 'addable'
       , 'renderComponent'

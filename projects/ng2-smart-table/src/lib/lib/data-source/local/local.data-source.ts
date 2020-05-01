@@ -58,11 +58,21 @@ export class LocalDataSource extends DataSource {
     return super.remove(element);
   }
 
-  update(element: any, values: any): Promise<any> {
+  update(element: any, value: any): Promise<any> {
     return new Promise((resolve, reject) => {
       this.find(element).then((found) => {
-        found = deepExtend(found, values);
-        super.update(found, values).then(resolve).catch(reject);
+        found = deepExtend(found, value);
+        super.update(found, value).then(resolve).catch(reject);
+      }).catch(reject);
+    });
+  }
+
+  updateField(element: any, field: string, value: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.find(element).then((found) => {
+        found[field] = value;
+        found = deepExtend(found, found);
+        super.updateField(found, field, value).then(resolve).catch(reject);
       }).catch(reject);
     });
   }
@@ -72,7 +82,6 @@ export class LocalDataSource extends DataSource {
     if (found) {
       return Promise.resolve(found);
     }
-
     return Promise.reject(new Error('Element was not found in the dataset'));
   }
 

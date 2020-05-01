@@ -74,7 +74,7 @@ export class Grid {
   }
 
   selectRow(row: Row) {
-    this.dataSet.selectRow(row);
+    this.dataSet.reverseSelectedFlagOnRow(row);
   }
 
   multipleSelectRow(row: Row) {
@@ -146,10 +146,9 @@ export class Grid {
   }
 
   delete(row: Row, confirmEmitter: EventEmitter<any>) {
-
     const deferred = new Deferred();
     deferred.promise.then(() => {
-      this.source.remove(row.getData());
+      this.source.remove(row.getData()).then();
     }).catch((err) => {
       // doing nothing
     });
@@ -166,14 +165,14 @@ export class Grid {
   }
 
   processDataChange(changes: DataSourceClass) {
-    if (this.shouldProcessChange(changes)) {
-      this.dataSet.setData(changes.elements);
-      if (this.settings.selectMode !== 'multi') {
-        const row = this.determineRowToSelect(changes);
-        if (row) {
-          this.onSelectRowSource.next(row);
-        }
-      }
+    if (!this.shouldProcessChange(changes)) { return; }
+
+    this.dataSet.setData(changes.elements);
+    if (this.settings.selectMode === 'multi') { return; }
+
+    const row = this.determineRowToSelect(changes);
+    if (row) {
+      this.onSelectRowSource.next(row);
     }
   }
 
@@ -183,7 +182,6 @@ export class Grid {
     } else if (['prepend', 'append'].includes(changes.action) && !this.settings.pager.display) {
       return true;
     }
-
     return false;
   }
 
@@ -197,11 +195,10 @@ export class Grid {
       case 'refresh':
         return this.dataSet.select();
       case 'add':
-      case 'update':
-        return this.dataSet.selectFirstRow();
       case 'append':
-      case 'prepend':
         return this.dataSet.selectLastRow();
+      case 'prepend':
+        return this.dataSet.selectFirstRow();
       case  'remove':
         return (changes.elements.length ? this.dataSet.selectPreviousRow() : this.dataSet.selectLastRow());
     }
@@ -209,9 +206,9 @@ export class Grid {
   }
 
   prepareSource(source: DataSource): DataSource {
-    const initialSource: SortClass = this.getInitialSort();
-    if (initialSource && initialSource.field && initialSource.direction) {
-      source.setSort([initialSource], false);
+    const initialSort: SortClass = this.getInitialSort();
+    if (initialSort && initialSort.field && initialSort.direction) {
+      source.setSort([initialSort], false);
     }
     if (this.settings.pager.display === true) {
       source.setPaging(1, this.settings.pager.perPage, false);

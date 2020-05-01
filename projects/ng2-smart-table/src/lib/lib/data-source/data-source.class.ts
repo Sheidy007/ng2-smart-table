@@ -6,6 +6,7 @@ export class DataSourceClass {
     'add' |
     'remove' |
     'update' |
+    'updateField' |
     'empty' |
     'sort' |
     'filter' |

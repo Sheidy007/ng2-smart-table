@@ -1,18 +1,18 @@
 export class SettingsClass {
-  mode: 'inline' | 'external' | 'click-to-edit';
-  selectMode: 'single' | 'multi';
-  hideHeader: boolean;
-  hideSubHeader: boolean;
+  mode: 'inline' | 'external' | 'click-to-edit' = 'inline';
+  selectMode: 'single' | 'multi' = 'single';
+  hideHeader = false;
+  hideSubHeader = false;
   actions: ActionsClass;
   filter: { inputClass: string };
   edit: EditClass;
   add: AddClass;
   delete: DeleteClass;
   attr: AttributeClass;
-  noDataMessage: string;
-  columns: {};
-  pager: PagerClass;
-  rowClassFunction: (...arg) => string;
+  noDataMessage = 'No data found';
+  columns = {};
+  pager = new PagerClass();
+  rowClassFunction: (...arg) => string = (...arg) => '';
 
   default() {
     this.mode = 'inline';
@@ -51,9 +51,9 @@ export class EditClass {
 
   constructor(
     public inputClass = '',
-    public editButton = 'Edit',
-    public saveButton = 'Update',
-    public cancelButton = 'Cancel',
+    public editButtonContent = 'Edit',
+    public saveButtonContent = 'Update',
+    public cancelButtonContent = 'Cancel',
     public confirmSave = false
   ) {
   }
@@ -72,6 +72,7 @@ export class AddClass {
 
 export class DeleteClass {
   constructor(
+    public inputClass = '',
     public deleteButtonContent = 'Delete',
     public confirmDelete = false
   ) {
@@ -90,6 +91,6 @@ export class AttributeClass {
 export class PagerClass {
   constructor(
     public display = true,
-    public perPage = 10) {
+    public perPage: number | number[] = [5, 10, 15]) {
   }
 }

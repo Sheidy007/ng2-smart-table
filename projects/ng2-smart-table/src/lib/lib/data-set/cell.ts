@@ -2,12 +2,12 @@ import { Column } from './column';
 import { DataSet } from './data-set';
 import { Row } from './row';
 
-export function prepareValue (value: any) { return value }
+export function prepareValue(value: any) { return value; }
 
 export class Cell {
 
-  newValue: any = '';
   protected static PREPARE = prepareValue;
+  newValue: any = '';
 
   constructor(protected value: any, protected row: Row, protected column: any, protected dataSet: DataSet) {
     this.newValue = value;
@@ -42,8 +42,7 @@ export class Cell {
   isEditable(): boolean {
     if (this.getRow().index === -1) {
       return this.getColumn().addable;
-    }
-    else {
+    } else {
       return this.getColumn().editable;
     }
   }
