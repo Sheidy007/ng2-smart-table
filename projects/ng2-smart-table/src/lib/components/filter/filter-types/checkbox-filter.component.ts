@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-
 import { DefaultFilter } from './default-filter';
 import { debounceTime } from 'rxjs/operators';
 
@@ -14,7 +13,7 @@ import { debounceTime } from 'rxjs/operators';
 })
 export class CheckboxFilterComponent extends DefaultFilter implements OnInit {
 
-  filterActive: boolean = false;
+  filterActive = false;
   inputControl = new FormControl();
 
   constructor() {

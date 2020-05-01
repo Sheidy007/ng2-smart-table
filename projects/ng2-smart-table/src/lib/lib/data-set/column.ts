@@ -1,42 +1,44 @@
 import { DataSet } from './data-set';
+import { ViewCell } from 'ng2-smart-table';
+import { FilterConfigClass } from '../../components/filter/filter.class';
 
 export class Column {
 
-  title: string = '';
-  type: string = '';
-  class: string = '';
-  width: string = '';
-  isSortable: boolean = false;
-  isEditable: boolean = true;
-  isAddable: boolean = true;
-  isFilterable: boolean = false;
-  sortDirection: string = '';
-  defaultSortDirection: string = '';
-  editor: { type: string, config: any, component: any } = { type: '', config: {}, component: null };
-  filter: { type: string, config: any, component: any } = { type: '', config: {}, component: null };
+  title = 'undefined';
+  type: 'html' | 'custom' | 'text' = 'text';
+  class = '';
+  width = '';
+  sort = false;
+  editable = true;
+  addable = true;
+  defaultSortDirection: 'desc' | 'asc' | '' = '';
+  editor: { type: string, config: any, component: any }
+    = { type: '', config: {}, component: null };
+  filter: { type: 'custom' | 'default', config: FilterConfigClass, component: any }
+    = { type: 'default', config: new FilterConfigClass(), component: null };
   renderComponent: any = null;
-  compareFunction: Function;
-  valuePrepareFunction: Function;
-  filterFunction: Function;
-  onComponentInitFunction: Function;
+  compareFunction: () => number = null;
+  valuePrepareFunction: () => any = null;
+  filterFunction: () => boolean = null;
+  onComponentInitFunction: () => ViewCell = null;
 
-  constructor(public id: string, protected settings: any, protected dataSet: DataSet) {
+  constructor(public id: string, protected columnSettings: Column, protected dataSet: DataSet) {
     this.process();
   }
 
-  getOnComponentInitFunction(): Function {
+  getOnComponentInitFunction(): () => ViewCell {
     return this.onComponentInitFunction;
   }
 
-  getCompareFunction(): Function {
+  getCompareFunction(): () => number {
     return this.compareFunction;
   }
 
-  getValuePrepareFunction(): Function {
+  getValuePrepareFunction(): () => any {
     return this.valuePrepareFunction;
   }
 
-  getFilterFunction(): Function {
+  getFilterFunction(): () => boolean {
     return this.filterFunction;
   }
 
@@ -44,47 +46,32 @@ export class Column {
     return this.editor && this.editor.config;
   }
 
-  getFilterType(): any {
-    return this.filter && this.filter.type;
+  getFilterType(): 'custom' | 'default' {
+    return this.filter ? this.filter.type : 'default';
   }
 
-  getFilterConfig(): any {
-    return this.filter && this.filter.config;
+  getFilterConfig(): FilterConfigClass {
+    return this.filter ? this.filter.config : new FilterConfigClass();
   }
 
   protected process() {
-    this.title = this.settings['title'];
-    this.class = this.settings['class'];
-    this.width = this.settings['width'];
-    this.type = this.prepareType();
-    this.editor = this.settings['editor'];
-    this.filter = this.settings['filter'];
-    this.renderComponent = this.settings['renderComponent'];
-
-    this.isFilterable = typeof this.settings['filter'] === 'undefined' ? true : !!this.settings['filter'];
-    this.defaultSortDirection = ['asc', 'desc']
-      .indexOf(this.settings['sortDirection']) !== -1 ? this.settings['sortDirection'] : '';
-    this.isSortable = typeof this.settings['sort'] === 'undefined' ? true : !!this.settings['sort'];
-    this.isEditable = typeof this.settings['editable'] === 'undefined' ? true : !!this.settings['editable'];
-    this.isAddable=typeof this.settings['addable'] === 'undefined' ? true : !!this.settings['addable'];
-    this.sortDirection = this.prepareSortDirection();
-
-    this.compareFunction = this.settings['compareFunction'];
-    this.valuePrepareFunction = this.settings['valuePrepareFunction'];
-    this.filterFunction = this.settings['filterFunction'];
-    this.onComponentInitFunction = this.settings['onComponentInitFunction'];
-  }
-
-  prepareType(): string {
-    return this.settings['type'] || this.determineType();
-  }
-
-  prepareSortDirection(): string {
-    return this.settings['sort'] === 'desc' ? 'desc' : 'asc';
-  }
-
-  determineType(): string {
-    // TODO: determine type by data
-    return 'text';
+    [
+      'title'
+      , 'class'
+      , 'width'
+      , 'editor'
+      , 'filter'
+      , 'sort'
+      , 'editable'
+      , 'addable'
+      , 'renderComponent'
+      , 'compareFunction'
+      , 'valuePrepareFunction'
+      , 'filterFunction'
+      , 'onComponentInitFunction'
+      , 'defaultSortDirection'
+    ].forEach(
+      field => this[field] = this.columnSettings[field] ? this.columnSettings[field] : this[field]
+    );
   }
 }

@@ -6,12 +6,13 @@ import { ServerSourceConf } from './server-source.conf';
 import { getDeepFromObject } from '../../helpers';
 
 import { map } from 'rxjs/operators';
+import { FilterClass } from '../data-source.class';
 
 export class ServerDataSource extends LocalDataSource {
 
   protected conf: ServerSourceConf;
 
-  protected lastRequestCount: number = 0;
+  protected lastRequestCount = 0;
 
   constructor(protected http: HttpClient, conf: ServerSourceConf | {} = {}) {
     super();
@@ -27,7 +28,7 @@ export class ServerDataSource extends LocalDataSource {
     return this.lastRequestCount;
   }
 
-  getElements(): Promise<any> {
+  getElementsPerPage(): Promise<any> {
     return this.requestElements()
       .pipe(map(res => {
         this.lastRequestCount = this.extractTotalFromResponse(res);
@@ -39,8 +40,8 @@ export class ServerDataSource extends LocalDataSource {
 
   /**
    * Extracts array of data from server response
-   * @param res
-   * @returns {any}
+   * @param res  contain res
+   * @returns any
    */
   protected extractDataFromResponse(res: any): Array<any> {
     const rawData = res.body;
@@ -57,8 +58,8 @@ export class ServerDataSource extends LocalDataSource {
   /**
    * Extracts total rows count from the server response
    * Looks for the count in the heders first, then in the response body
-   * @param res
-   * @returns {any}
+   * @param res  contain res
+   * @returns any
    */
   protected extractTotalFromResponse(res: any): number {
     if (res.headers.has(this.conf.totalKey)) {
@@ -70,7 +71,7 @@ export class ServerDataSource extends LocalDataSource {
   }
 
   protected requestElements(): Observable<any> {
-    let httpParams = this.createRequesParams();
+    const httpParams = this.createRequesParams();
     return this.http.get(this.conf.endPoint, { params: httpParams, observe: 'response' });
   }
 
@@ -96,9 +97,10 @@ export class ServerDataSource extends LocalDataSource {
   protected addFilterRequestParams(httpParams: HttpParams): HttpParams {
 
     if (this.filterConf.filters) {
-      this.filterConf.filters.forEach((fieldConf: any) => {
-        if (fieldConf['search']) {
-          httpParams = httpParams.set(this.conf.filterFieldKey.replace('#field#', fieldConf['field']), fieldConf['search']);
+      this.filterConf.filters.forEach((fieldConf: FilterClass) => {
+        if (fieldConf.search) {
+          httpParams = httpParams.set(this.conf.filterFieldKey
+            .replace('#field#', fieldConf.field), fieldConf.search);
         }
       });
     }
@@ -108,9 +110,9 @@ export class ServerDataSource extends LocalDataSource {
 
   protected addPagerRequestParams(httpParams: HttpParams): HttpParams {
 
-    if (this.pagingConf && this.pagingConf['page'] && this.pagingConf['perPage']) {
-      httpParams = httpParams.set(this.conf.pagerPageKey, this.pagingConf['page']);
-      httpParams = httpParams.set(this.conf.pagerLimitKey, this.pagingConf['perPage']);
+    if (this.pagingConf && this.pagingConf.page && this.pagingConf.perPage) {
+      httpParams = httpParams.set(this.conf.pagerPageKey, this.pagingConf.page.toString());
+      httpParams = httpParams.set(this.conf.pagerLimitKey, this.pagingConf.perPage.toString());
     }
 
     return httpParams;

@@ -6,7 +6,7 @@ import { map } from 'rxjs/operators';
 @Injectable()
 export class CustomServerDataSource extends LocalDataSource {
 
-  lastRequestCount: number = 0;
+  lastRequestCount = 0;
 
   constructor(protected http: HttpClient) {
     super();
@@ -16,11 +16,11 @@ export class CustomServerDataSource extends LocalDataSource {
     return this.lastRequestCount;
   }
 
-  getElements(): Promise<any> {
+  getElementsPerPage(): Promise<any> {
     let url = 'https://jsonplaceholder.typicode.com/photos?';
 
     if (this.sortConf) {
-      this.sortConf.forEach((fieldConf) => {
+      this.sortConf.sorts.forEach((fieldConf) => {
         url += `_sort=${fieldConf.field}&_order=${fieldConf.direction.toUpperCase()}&`;
       });
     }

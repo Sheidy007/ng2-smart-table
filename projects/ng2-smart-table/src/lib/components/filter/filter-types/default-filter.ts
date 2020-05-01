@@ -1,6 +1,5 @@
 import { Input, Output, EventEmitter, OnDestroy, Component } from '@angular/core';
 import { Subscription } from 'rxjs';
-
 import { Column } from '../../../lib/data-set/column';
 
 @Component({
@@ -8,12 +7,12 @@ import { Column } from '../../../lib/data-set/column';
 })
 export class DefaultFilter implements Filter, OnDestroy {
 
-  delay: number = 300;
   changesSubscription: Subscription;
-  @Input() query: string;
+  @Input() delay = 300;
+  @Input() query: string | boolean | number;
   @Input() inputClass: string;
   @Input() column: Column;
-  @Output() filter = new EventEmitter<string>();
+  @Output() filter = new EventEmitter<string | boolean | number>();
 
   ngOnDestroy() {
     if (this.changesSubscription) {
@@ -22,7 +21,7 @@ export class DefaultFilter implements Filter, OnDestroy {
   }
 
   setFilter() {
-    this.filter.emit(this.query);
+    this.filter.emit();
   }
 }
 
@@ -30,8 +29,8 @@ export interface Filter {
 
   delay?: number;
   changesSubscription?: Subscription;
-  query: string;
+  query: string | boolean | number;
   inputClass: string;
   column: Column;
-  filter: EventEmitter<string>;
+  filter: EventEmitter< string | boolean | number>;
 }

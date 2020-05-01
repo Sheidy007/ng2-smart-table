@@ -41,10 +41,10 @@ export class Cell {
 
   isEditable(): boolean {
     if (this.getRow().index === -1) {
-      return this.getColumn().isAddable;
+      return this.getColumn().addable;
     }
     else {
-      return this.getColumn().isEditable;
+      return this.getColumn().editable;
     }
   }
 

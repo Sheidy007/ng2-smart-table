@@ -27,8 +27,6 @@ export class CustomFilterComponent extends FilterDefault implements OnChanges, O
     if (this.column && !this.customComponent) {
       const componentFactory = this.resolver.resolveComponentFactory(this.column.filter.component);
       this.customComponent = this.dynamicTarget.createComponent(componentFactory);
-
-      // set @Inputs and @Outputs of custom component
       this.customComponent.instance.query = this.query;
       this.customComponent.instance.column = this.column;
       this.customComponent.instance.source = this.source;

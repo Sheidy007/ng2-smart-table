@@ -1,7 +1,6 @@
 import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, skip } from 'rxjs/operators';
-
 import { DefaultFilter } from './default-filter';
 
 @Component({
@@ -33,7 +32,7 @@ export class InputFilterComponent extends DefaultFilter implements OnInit, OnCha
         debounceTime(this.delay),
       )
       .subscribe((value: string) => {
-        this.query = this.inputControl.value;
+        this.query = value;
         this.setFilter();
       });
   }

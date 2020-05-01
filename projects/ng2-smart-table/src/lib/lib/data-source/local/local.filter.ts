@@ -1,15 +1,16 @@
-export function filterValues(value: string, search: string) {
+export function filterValues(value: string, search: string): boolean {
   return value.toString().toLowerCase().includes(search.toString().toLowerCase());
 }
 
 export class LocalFilter {
 
-  static filter(data: Array<any>, field: string, search: string, customFilter?: Function): Array<any> {
-    const filter: Function = customFilter ? customFilter : filterValues;
+  static filter(data: any[], field: string, search: string, customFilter?: () => boolean): Array<any> {
+    const filter: (value: string, search: string) => boolean = customFilter ? customFilter : filterValues;
 
     return data.filter((el) => {
-      const value = typeof el[field] === 'undefined' || el[field] === null ? '' : el[field];
+      const value = !el[field] ? '' : el[field];
       return filter.call(null, value, search);
     });
   }
 }
+

@@ -1,20 +1,20 @@
 import { Row } from './row';
 import { Column } from './column';
+import { SettingsClass } from '../settings.class';
 
 export class DataSet {
 
   newRow: Row;
 
-  protected data: Array<any> = [];
-  protected columns: Array<Column> = [];
-  protected rows: Array<Row> = [];
+  protected data: any[] = [];
+  protected columns: Column[] = [];
+  protected rows: Row[] = [];
   protected selectedRow: Row;
-  protected willSelect: string = 'first';
+  protected willSelect = 'first';
 
-  constructor(data: Array<any> = [], protected columnSettings: Object) {
+  constructor(data: Array<any> = [], protected columnSettings: any) {
     this.createColumns(columnSettings);
     this.setData(data);
-
     this.createNewRow();
   }
 
@@ -125,20 +125,18 @@ export class DataSet {
 
   /**
    * Create columns by mapping from the settings
-   * @param settings
-   * @private
+   * @param columnsSettings  contain columnsSettings
    */
-  createColumns(settings: any) {
-    for (const id in settings) {
-      if (settings.hasOwnProperty(id)) {
-        this.columns.push(new Column(id, settings[id], this));
+  createColumns(columnsSettings: any) {
+    for (const id in columnsSettings) {
+      if (columnsSettings.hasOwnProperty(id)) {
+        this.columns.push(new Column(id, columnsSettings[id], this));
       }
     }
   }
 
   /**
    * Create rows based on current data prepared in data source
-   * @private
    */
   createRows() {
     this.rows = [];

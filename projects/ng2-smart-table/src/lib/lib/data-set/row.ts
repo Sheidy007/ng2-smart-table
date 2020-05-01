@@ -4,12 +4,12 @@ import { DataSet } from './data-set';
 
 export class Row {
 
-  isSelected: boolean = false;
-  isInEditing: boolean = false;
+  isSelected = false;
+  isInEditing = false;
   cells: Array<Cell> = [];
 
 
-  constructor(public index: number, protected data: any, protected _dataSet: DataSet) {
+  constructor(public index: number, protected data: any, protected dataSet: DataSet) {
     this.process();
   }
 
@@ -42,7 +42,7 @@ export class Row {
 
   process() {
     this.cells = [];
-    this._dataSet.getColumns().forEach((column: Column) => {
+    this.dataSet.getColumns().forEach((column: Column) => {
       const cell = this.createCell(column);
       this.cells.push(cell);
     });
@@ -51,6 +51,6 @@ export class Row {
   createCell(column: Column): Cell {
     const defValue = (column as any).settings.defaultValue ? (column as any).settings.defaultValue : '';
     const value = typeof this.data[column.id] === 'undefined' ? defValue : this.data[column.id];
-    return new Cell(value, this, column, this._dataSet);
+    return new Cell(value, this, column, this.dataSet);
   }
 }

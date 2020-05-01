@@ -4,8 +4,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Ng2CompleterModule } from '@akveo/ng2-completer';
 
 import { FilterComponent } from './filter.component';
-import { DefaultFilterComponent } from "./default-filter.component";
-import { CustomFilterComponent } from "./custom-filter.component";
+import { DefaultFilterComponent } from './default-filter.component';
+import { CustomFilterComponent } from './custom-filter.component';
 import { CheckboxFilterComponent } from './filter-types/checkbox-filter.component';
 import { CompleterFilterComponent } from './filter-types/completer-filter.component';
 import { InputFilterComponent } from './filter-types/input-filter.component';
@@ -22,7 +22,7 @@ const FILTER_COMPONENTS = [
   CheckboxFilterComponent,
   CompleterFilterComponent,
   InputFilterComponent,
-  SelectFilterComponent,
+  SelectFilterComponent
 ];
 
 @NgModule({
@@ -30,13 +30,13 @@ const FILTER_COMPONENTS = [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    Ng2CompleterModule,
+    Ng2CompleterModule
   ],
   declarations: [
-    ...FILTER_COMPONENTS,
+    ...FILTER_COMPONENTS
   ],
   exports: [
-    ...FILTER_COMPONENTS,
-  ],
+    ...FILTER_COMPONENTS
+  ]
 })
-export class FilterModule { }
+export class FilterModule {}

@@ -1,52 +1,48 @@
 import { Subject } from 'rxjs';
 import { Observable } from 'rxjs';
 import { EventEmitter } from '@angular/core';
-
-import { Deferred, getDeepFromObject } from './helpers';
+import { Deferred } from './helpers';
 import { Column } from './data-set/column';
 import { Row } from './data-set/row';
 import { DataSet } from './data-set/data-set';
 import { DataSource } from './data-source/data-source';
+import { DataSourceClass, SortClass } from './data-source/data-source.class';
+import { SettingsClass } from './settings.class';
 
 export class Grid {
 
-  createFormShown: boolean = false;
-
   source: DataSource;
-  settings: any;
+  settings: SettingsClass;
   dataSet: DataSet;
 
+  createFormShown = false;
   onSelectRowSource = new Subject<any>();
 
   constructor(source: DataSource, settings: any) {
-    this.setSettings(settings);
     this.setSource(source);
+    this.setSettings(settings);
   }
 
-  showActionColumn(position: string): boolean {
-    return this.isCurrentActionsPosition(position) && this.isActionsVisible();
-  }
-
-  isCurrentActionsPosition(position: string): boolean {
-    return position == this.getSetting('actions.position');
+  showActionColumn(position: 'left' | 'right'): boolean {
+    return position === this.settings.actions.position && this.isActionsVisible();
   }
 
   isActionsVisible(): boolean {
-    return this.getSetting('actions.add') || this.getSetting('actions.edit') || this.getSetting('actions.delete') || this.getSetting('actions.custom').length;
+    return !!this.settings.actions.add || !!this.settings.actions.edit
+      || !!this.settings.actions.delete || !!this.settings.actions.custom.length;
   }
 
   isMultiSelectVisible(): boolean {
-    return this.getSetting('selectMode') === 'multi';
+    return this.settings.selectMode === 'multi';
   }
 
   getNewRow(): Row {
     return this.dataSet.newRow;
   }
 
-  setSettings(settings: Object) {
+  setSettings(settings) {
     this.settings = settings;
-    this.dataSet = new DataSet([], this.getSetting('columns'));
-
+    this.dataSet = new DataSet([], this.settings.columns);
     if (this.source) {
       this.source.refresh();
     }
@@ -58,17 +54,15 @@ export class Grid {
 
   setSource(source: DataSource) {
     this.source = this.prepareSource(source);
-
-    this.source.onChanged().subscribe((changes: any) => this.processDataChange(changes));
-
-    this.source.onUpdated().subscribe((data: any) => {
+    this.source.onChanged.subscribe((changes: any) => this.processDataChange(changes));
+    this.source.onUpdated.subscribe((data: any) => {
       const changedRow = this.dataSet.findRowByData(data);
       changedRow.setData(data);
     });
   }
 
-  getSetting(name: string, defaultValue?: any): any {
-    return getDeepFromObject(this.settings, name, defaultValue);
+  getSetting(): SettingsClass {
+    return this.settings;
   }
 
   getColumns(): Array<Column> {
@@ -112,11 +106,11 @@ export class Grid {
       // doing nothing
     });
 
-    if (this.getSetting('add.confirmCreate')) {
+    if (this.settings.add.confirmCreate) {
       confirmEmitter.emit({
         newData: row.getNewData(),
         source: this.source,
-        confirm: deferred,
+        confirm: deferred
       });
     } else {
       deferred.resolve();
@@ -139,12 +133,12 @@ export class Grid {
       // doing nothing
     });
 
-    if (this.getSetting('edit.confirmSave')) {
+    if (this.settings.edit.confirmSave) {
       confirmEmitter.emit({
         data: row.getData(),
         newData: row.getNewData(),
         source: this.source,
-        confirm: deferred,
+        confirm: deferred
       });
     } else {
       deferred.resolve();
@@ -160,23 +154,22 @@ export class Grid {
       // doing nothing
     });
 
-    if (this.getSetting('delete.confirmDelete')) {
+    if (this.settings.delete.confirmDelete) {
       confirmEmitter.emit({
         data: row.getData(),
         source: this.source,
-        confirm: deferred,
+        confirm: deferred
       });
     } else {
       deferred.resolve();
     }
   }
 
-  processDataChange(changes: any) {
+  processDataChange(changes: DataSourceClass) {
     if (this.shouldProcessChange(changes)) {
-      this.dataSet.setData(changes['elements']);
-      if (this.getSetting('selectMode') !== 'multi') {
+      this.dataSet.setData(changes.elements);
+      if (this.settings.selectMode !== 'multi') {
         const row = this.determineRowToSelect(changes);
-
         if (row) {
           this.onSelectRowSource.next(row);
         }
@@ -184,10 +177,10 @@ export class Grid {
     }
   }
 
-  shouldProcessChange(changes: any): boolean {
-    if (['filter', 'sort', 'page', 'remove', 'refresh', 'load', 'paging'].indexOf(changes['action']) !== -1) {
+  shouldProcessChange(changes: DataSourceClass): boolean {
+    if (['filter', 'sort', 'page', 'remove', 'refresh', 'load', 'paging'].includes(changes.action)) {
       return true;
-    } else if (['prepend', 'append'].indexOf(changes['action']) !== -1 && !this.getSetting('pager.display')) {
+    } else if (['prepend', 'append'].includes(changes.action) && !this.settings.pager.display) {
       return true;
     }
 
@@ -195,43 +188,33 @@ export class Grid {
   }
 
   // TODO: move to selectable? Separate directive
-  determineRowToSelect(changes: any): Row {
-
-    if (['load', 'page', 'filter', 'sort', 'refresh'].indexOf(changes['action']) !== -1) {
-      return this.dataSet.select();
-    }
-    if (changes['action'] === 'remove') {
-      if (changes['elements'].length === 0) {
-        // we have to store which one to select as the data will be reloaded
-        this.dataSet.willSelectLastRow();
-      } else {
-        return this.dataSet.selectPreviousRow();
-      }
-    }
-    if (changes['action'] === 'append') {
-      // we have to store which one to select as the data will be reloaded
-      this.dataSet.willSelectLastRow();
-    }
-    if (changes['action'] === 'add') {
-      return this.dataSet.selectFirstRow();
-    }
-    if (changes['action'] === 'update') {
-      return this.dataSet.selectFirstRow();
-    }
-    if (changes['action'] === 'prepend') {
-      // we have to store which one to select as the data will be reloaded
-      this.dataSet.willSelectFirstRow();
+  determineRowToSelect(changes: DataSourceClass): Row {
+    switch (changes.action) {
+      case 'load':
+      case 'page':
+      case 'filter':
+      case 'sort':
+      case 'refresh':
+        return this.dataSet.select();
+      case 'add':
+      case 'update':
+        return this.dataSet.selectFirstRow();
+      case 'append':
+      case 'prepend':
+        return this.dataSet.selectLastRow();
+      case  'remove':
+        return (changes.elements.length ? this.dataSet.selectPreviousRow() : this.dataSet.selectLastRow());
     }
     return null;
   }
 
-  prepareSource(source: any): DataSource {
-    const initialSource: any = this.getInitialSort();
-    if (initialSource && initialSource['field'] && initialSource['direction']) {
+  prepareSource(source: DataSource): DataSource {
+    const initialSource: SortClass = this.getInitialSort();
+    if (initialSource && initialSource.field && initialSource.direction) {
       source.setSort([initialSource], false);
     }
-    if (this.getSetting('pager.display') === true) {
-      source.setPaging(1, this.getSetting('pager.perPage'), false);
+    if (this.settings.pager.display === true) {
+      source.setPaging(1, this.settings.pager.perPage, false);
     }
 
     source.refresh();
@@ -239,12 +222,12 @@ export class Grid {
   }
 
   getInitialSort() {
-    const sortConf: any = {};
+    const sortConf: SortClass = new SortClass();
     this.getColumns().forEach((column: Column) => {
-      if (column.isSortable && column.defaultSortDirection) {
-        sortConf['field'] = column.id;
-        sortConf['direction'] = column.defaultSortDirection;
-        sortConf['compare'] = column.getCompareFunction();
+      if (column.sort && column.defaultSortDirection) {
+        sortConf.field = column.id;
+        sortConf.direction = column.defaultSortDirection;
+        sortConf.compare = column.getCompareFunction();
       }
     });
     return sortConf;

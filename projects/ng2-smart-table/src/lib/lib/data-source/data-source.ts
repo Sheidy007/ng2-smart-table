@@ -1,19 +1,20 @@
 import { Subject } from 'rxjs';
-import { Observable } from 'rxjs';
+import { DataSourceClass, FilterClass, FilterConfClass, PagingClass, SortClass } from './data-source.class';
 
 export abstract class DataSource {
 
-  protected onChangedSource = new Subject<any>();
-  protected onAddedSource = new Subject<any>();
-  protected onUpdatedSource = new Subject<any>();
-  protected onRemovedSource = new Subject<any>();
+  onChanged = new Subject<DataSourceClass>();
+  onAdded = new Subject<DataSourceClass>();
+  onUpdated = new Subject<DataSourceClass>();
+  onRemoved = new Subject<DataSourceClass>();
 
-  abstract getAll(): Promise<any>;
-  abstract getElements(): Promise<any>;
-  abstract getSort(): any;
-  abstract getFilter(): any;
-  abstract getPaging(): any;
+  abstract getAll(): Promise<any[]>;
+  abstract getElementsPerPage(): Promise<any[]>;
+  abstract getSort(): SortClass[];
+  abstract getFilter(): FilterConfClass;
+  abstract getPaging(): PagingClass;
   abstract count(): number;
+  abstract countAll(): number;
 
   refresh() {
     this.emitOnChanged('refresh');
@@ -22,22 +23,6 @@ export abstract class DataSource {
   load(data: Array<any>): Promise<any> {
     this.emitOnChanged('load');
     return Promise.resolve();
-  }
-
-  onChanged(): Observable<any> {
-    return this.onChangedSource.asObservable();
-  }
-
-  onAdded(): Observable<any> {
-    return this.onAddedSource.asObservable();
-  }
-
-  onUpdated(): Observable<any> {
-    return this.onUpdatedSource.asObservable();
-  }
-
-  onRemoved(): Observable<any> {
-    return this.onRemovedSource.asObservable();
   }
 
   prepend(element: any): Promise<any> {
@@ -75,19 +60,25 @@ export abstract class DataSource {
     return Promise.resolve();
   }
 
-  setSort(conf: Array<any>, doEmit?: boolean) {
+  setSort(conf: SortClass[], doEmit?: boolean , multiSort?: boolean) {
     if (doEmit) {
       this.emitOnChanged('sort');
     }
   }
 
-  setFilter(conf: Array<any>, andOperator?: boolean, doEmit?: boolean) {
+  addSort(conf: SortClass, doEmit?: boolean , multiSort?: boolean) {
+    if (doEmit) {
+      this.emitOnChanged('sort');
+    }
+  }
+
+  setFilter(conf: FilterClass[], andOperator?: boolean, doEmit?: boolean) {
     if (doEmit) {
       this.emitOnChanged('filter');
     }
   }
 
-  addFilter(fieldConf: {}, andOperator?: boolean, doEmit?: boolean) {
+  addFilter(fieldConf: FilterClass, andOperator?: boolean, doEmit?: boolean) {
     if (doEmit) {
       this.emitOnChanged('filter');
     }
@@ -106,24 +97,24 @@ export abstract class DataSource {
   }
 
   protected emitOnRemoved(element: any) {
-    this.onRemovedSource.next(element);
+    this.onRemoved.next(element);
   }
 
   protected emitOnUpdated(element: any) {
-    this.onUpdatedSource.next(element);
+    this.onUpdated.next(element);
   }
 
   protected emitOnAdded(element: any) {
-    this.onAddedSource.next(element);
+    this.onAdded.next(element);
   }
 
-  protected emitOnChanged(action: string) {
-    this.getElements().then((elements) => this.onChangedSource.next({
-      action: action,
-      elements: elements,
+  protected emitOnChanged(action) {
+    this.getElementsPerPage().then((elements) => this.onChanged.next({
+      action,
+      elements,
       paging: this.getPaging(),
       filter: this.getFilter(),
-      sort: this.getSort(),
-    }));
+      sort: this.getSort()
+    } as DataSourceClass));
   }
 }

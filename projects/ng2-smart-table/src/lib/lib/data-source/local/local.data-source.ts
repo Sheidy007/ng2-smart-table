@@ -1,29 +1,34 @@
-import { LocalSorter } from './local.sorter';
+import { LocalMultiSorter, LocalSorter } from './local.sorter';
 import { LocalFilter } from './local.filter';
 import { LocalPager } from './local.pager';
 import { DataSource } from '../data-source';
 import { deepExtend } from '../../helpers';
+import { FilterClass, FilterConfClass, PagingClass, SortClass, SortConfClass } from '../data-source.class';
 
 export class LocalDataSource extends DataSource {
 
-  protected data: Array<any> = [];
-  protected filteredAndSorted: Array<any> = [];
-  protected sortConf: Array<any> = [];
-  protected filterConf: any = {
-    filters: [],
-    andOperator: true,
+  protected data = [];
+  protected filteredAndSorted = [];
+  protected sortConf: SortConfClass = {
+    sorts: [],
+    multiSort: false
   };
-  protected pagingConf: any = {};
+  protected filterConf: FilterConfClass = {
+    filters: [],
+    andOperator: true
+  };
+  protected pagingConf: PagingClass = {
+    page: 1,
+    perPage: 10
+  };
 
   constructor(data: Array<any> = []) {
     super();
-
     this.data = data;
   }
 
   load(data: Array<any>): Promise<any> {
     this.data = data;
-
     return super.load(data);
   }
 
@@ -71,30 +76,31 @@ export class LocalDataSource extends DataSource {
     return Promise.reject(new Error('Element was not found in the dataset'));
   }
 
-  getElements(): Promise<any> {
-    const data = this.data.slice(0);
-    return Promise.resolve(this.prepareData(data));
+  getElementsPerPage(): Promise<any> {
+    return Promise.resolve(this.prepareData(this.data));
   }
 
   getFilteredAndSorted(): Promise<any> {
-    let data = this.data.slice(0);
-    this.prepareData(data);
+    this.prepareData(this.data);
     return Promise.resolve(this.filteredAndSorted);
   }
 
   getAll(): Promise<any> {
-    const data = this.data.slice(0);
+    const data = this.data.slice();
     return Promise.resolve(data);
   }
 
-  reset(silent = false) {
-    if (silent) {
+  reset(doEmit = false) {
+    if (doEmit) {
       this.filterConf = {
         filters: [],
-        andOperator: true,
+        andOperator: true
       };
-      this.sortConf = [];
-      this.pagingConf['page'] = 1;
+      this.sortConf = {
+        sorts: [],
+        multiSort: false
+      };
+      this.pagingConf.page = 1;
     } else {
       this.setFilter([], true, false);
       this.setSort([], false);
@@ -104,12 +110,15 @@ export class LocalDataSource extends DataSource {
 
   empty(): Promise<any> {
     this.data = [];
-
     return super.empty();
   }
 
   count(): number {
     return this.filteredAndSorted.length;
+  }
+
+  countAll(): number {
+    return this.data.length;
   }
 
   /**
@@ -118,22 +127,44 @@ export class LocalDataSource extends DataSource {
    * [
    *  {field: string, direction: asc|desc|null, compare: Function|null},
    * ]
-   * @param conf
-   * @param doEmit
-   * @returns {LocalDataSource}
+   * @param conf contain conf
+   * @param doEmit contain doEmit
+   * @param multiSort contain multiSort
+   * @returns LocalDataSource1 contain LocalDataSource
    */
-  setSort(conf: Array<any>, doEmit = true): LocalDataSource {
-    if (conf !== null) {
-
+  setSort(conf: SortClass[], doEmit = true, multiSort = false): LocalDataSource {
+    if (conf && conf.length) {
       conf.forEach((fieldConf) => {
-        if (!fieldConf['field'] || typeof fieldConf['direction'] === 'undefined') {
-          throw new Error('Sort configuration object is not valid');
-        }
+        this.addSort(fieldConf, false, multiSort);
       });
-      this.sortConf = conf;
+    } else {
+      this.sortConf = {
+        sorts: [],
+        multiSort: true
+      };
+    }
+    this.sortConf.multiSort = multiSort;
+    super.setSort(conf, doEmit, multiSort);
+    return this;
+  }
+
+  addSort(fieldConf: SortClass, doEmit = true, multiSort = false): LocalDataSource {
+    if (!fieldConf.field || !fieldConf.direction) {
+      throw new Error('Sort configuration object is not valid');
     }
 
-    super.setSort(conf, doEmit);
+    let found = false;
+    this.sortConf.sorts.forEach((currentFieldConf: SortClass, index: any) => {
+      if (currentFieldConf.field === fieldConf.field) {
+        this.sortConf.sorts[index] = fieldConf;
+        found = true;
+      }
+    });
+    if (!found) {
+      this.sortConf.sorts.push(fieldConf);
+    }
+    this.sortConf.multiSort = multiSort;
+    super.addSort(fieldConf, doEmit, multiSort);
     return this;
   }
 
@@ -143,37 +174,37 @@ export class LocalDataSource extends DataSource {
    * [
    *  {field: string, search: string, filter: Function|null},
    * ]
-   * @param conf
-   * @param andOperator
-   * @param doEmit
-   * @returns {LocalDataSource}
+   * @param conf contain conf
+   * @param andOperator contain andOperator
+   * @param doEmit contain doEmit
+   * @returns LocalDataSource contain LocalDataSource
    */
-  setFilter(conf: Array<any>, andOperator = true, doEmit = true): LocalDataSource {
-    if (conf && conf.length > 0) {
+  setFilter(conf: FilterClass[], andOperator = true, doEmit = true): LocalDataSource {
+    if (conf && conf.length) {
       conf.forEach((fieldConf) => {
         this.addFilter(fieldConf, andOperator, false);
       });
     } else {
       this.filterConf = {
         filters: [],
-        andOperator: true,
+        andOperator: true
       };
     }
     this.filterConf.andOperator = andOperator;
-    this.pagingConf['page'] = 1;
+    this.pagingConf.page = 1;
 
     super.setFilter(conf, andOperator, doEmit);
     return this;
   }
 
-  addFilter(fieldConf: any, andOperator = true, doEmit: boolean = true): LocalDataSource {
-    if (!fieldConf['field'] || typeof fieldConf['search'] === 'undefined') {
+  addFilter(fieldConf: FilterClass, andOperator = true, doEmit: boolean = true): LocalDataSource {
+    if (!fieldConf.field || !fieldConf.search) {
       throw new Error('Filter configuration object is not valid');
     }
 
     let found = false;
-    this.filterConf.filters.forEach((currentFieldConf: any, index: any) => {
-      if (currentFieldConf['field'] === fieldConf['field']) {
+    this.filterConf.filters.forEach((currentFieldConf: FilterClass, index: any) => {
+      if (currentFieldConf.field === fieldConf.field) {
         this.filterConf.filters[index] = fieldConf;
         found = true;
       }
@@ -187,15 +218,15 @@ export class LocalDataSource extends DataSource {
   }
 
   setPaging(page: number, perPage: number, doEmit: boolean = true): LocalDataSource {
-    this.pagingConf['page'] = page;
-    this.pagingConf['perPage'] = perPage;
+    this.pagingConf.page = page;
+    this.pagingConf.perPage = perPage;
 
     super.setPaging(page, perPage, doEmit);
     return this;
   }
 
   setPage(page: number, doEmit: boolean = true): LocalDataSource {
-    this.pagingConf['page'] = page;
+    this.pagingConf.page = page;
     super.setPage(page, doEmit);
     return this;
   }
@@ -213,53 +244,56 @@ export class LocalDataSource extends DataSource {
   }
 
   protected prepareData(data: Array<any>): Array<any> {
-    data = this.filter(data);
-    data = this.sort(data);
-    this.filteredAndSorted = data.slice(0);
-
+    this.filteredAndSorted = this.sort(this.filter(data));
     return this.paginate(data);
   }
 
-  protected sort(data: Array<any>): Array<any> {
-    if (this.sortConf) {
-      this.sortConf.forEach((fieldConf) => {
-        data = LocalSorter
-          .sort(data, fieldConf['field'], fieldConf['direction'], fieldConf['compare']);
-      });
+  protected sort(data: any[]): any[] {
+    if (!this.sortConf.sorts) {
+      return data;
     }
-    return data;
-  }
-
-  // TODO: refactor?
-  protected filter(data: Array<any>): Array<any> {
-    if (this.filterConf.filters) {
-      if (this.filterConf.andOperator) {
-        this.filterConf.filters.forEach((fieldConf: any) => {
-          if (fieldConf['search'].length > 0) {
-            data = LocalFilter
-              .filter(data, fieldConf['field'], fieldConf['search'], fieldConf['filter']);
-          }
-        });
-      } else {
-        let mergedData: any = [];
-        this.filterConf.filters.forEach((fieldConf: any) => {
-          if (fieldConf['search'].length > 0) {
-            mergedData = mergedData.concat(LocalFilter
-              .filter(data, fieldConf['field'], fieldConf['search'], fieldConf['filter']));
-          }
-        });
-        // remove non unique items
-        data = mergedData.filter((elem: any, pos: any, arr: any) => {
-          return arr.indexOf(elem) === pos;
-        });
+    let multiSortData: any = [];
+    this.sortConf.sorts.forEach((fieldConf) => {
+      if (fieldConf.direction && fieldConf.field.length) {
+        if (this.sortConf.multiSort) {
+          data = LocalSorter
+            .sort(data, fieldConf.field, fieldConf.direction, fieldConf.compare);
+        } else {
+          multiSortData = LocalMultiSorter
+            .sort(data, this.sortConf.sorts);
+        }
       }
-    }
-    return data;
+      data = LocalSorter
+        .sort(data, fieldConf.field, fieldConf.direction, fieldConf.compare);
+    });
+
+    return !this.sortConf.multiSort ? data : multiSortData;
   }
 
-  protected paginate(data: Array<any>): Array<any> {
-    if (this.pagingConf && this.pagingConf['page'] && this.pagingConf['perPage']) {
-      data = LocalPager.paginate(data, this.pagingConf['page'], this.pagingConf['perPage']);
+  protected filter(data: any[]): any[] {
+    if (!this.filterConf.filters) {
+      return data;
+    }
+
+    let mergedData: any = [];
+    this.filterConf.filters.forEach((fieldConf) => {
+      if (fieldConf.search.length && fieldConf.field.length) {
+        if (this.filterConf.andOperator) {
+          data = LocalFilter
+            .filter(data, fieldConf.field, fieldConf.search, fieldConf.filter);
+        } else {
+          mergedData = [...new Set([...mergedData, ...LocalFilter
+            .filter(data, fieldConf.field, fieldConf.search, fieldConf.filter)])];
+        }
+      }
+    });
+
+    return this.filterConf.andOperator ? data : mergedData;
+  }
+
+  protected paginate(data: any[]): any[] {
+    if (!this.pagingConf && this.pagingConf.page && this.pagingConf.perPage) {
+      data = LocalPager.paginate(data, this.pagingConf.page, this.pagingConf.perPage);
     }
     return data;
   }

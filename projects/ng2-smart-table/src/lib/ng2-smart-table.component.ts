@@ -5,6 +5,7 @@ import { DataSource } from './lib/data-source/data-source';
 import { Row } from './lib/data-set/row';
 import { deepExtend } from './lib/helpers';
 import { LocalDataSource } from './lib/data-source/local/local.data-source';
+import { SettingsClass } from './lib/settings.class';
 
 @Component({
   selector: 'ng2-smart-table',
@@ -14,7 +15,7 @@ import { LocalDataSource } from './lib/data-source/local/local.data-source';
 export class Ng2SmartTableComponent implements OnChanges {
 
   @Input() source: any;
-  @Input() settings: Object = {};
+  @Input() settings: SettingsClass;
 
   @Output() rowSelect = new EventEmitter<any>();
   @Output() userRowSelect = new EventEmitter<any>();
@@ -33,58 +34,9 @@ export class Ng2SmartTableComponent implements OnChanges {
   isHideHeader: boolean;
   isHideSubHeader: boolean;
   isPagerDisplay: boolean;
-  rowClassFunction: Function;
-
-
+  rowClassFunction: () => string;
   grid: Grid;
-  defaultSettings: Object = {
-    mode: 'inline', // inline|external|click-to-edit
-    selectMode: 'single', // single|multi
-    hideHeader: false,
-    hideSubHeader: false,
-    actions: {
-      columnTitle: 'Actions',
-      add: true,
-      edit: true,
-      delete: true,
-      custom: [],
-      position: 'left', // left|right
-    },
-    filter: {
-      inputClass: '',
-    },
-    edit: {
-      inputClass: '',
-      editButtonContent: 'Edit',
-      saveButtonContent: 'Update',
-      cancelButtonContent: 'Cancel',
-      confirmSave: false,
-    },
-    add: {
-      inputClass: '',
-      addButtonContent: 'Add New',
-      createButtonContent: 'Create',
-      cancelButtonContent: 'Cancel',
-      confirmCreate: false,
-    },
-    delete: {
-      deleteButtonContent: 'Delete',
-      confirmDelete: false,
-    },
-    attr: {
-      id: '',
-      class: '',
-    },
-    noDataMessage: 'No data found',
-    columns: {},
-    pager: {
-      display: true,
-      perPage: 10,
-    },
-    rowClassFunction: () => ""
-  };
-
-  isAllSelected: boolean = false;
+  isAllSelected = false;
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
     if (this.grid) {
@@ -98,18 +50,17 @@ export class Ng2SmartTableComponent implements OnChanges {
     } else {
       this.initGrid();
     }
-    this.tableId = this.grid.getSetting('attr.id');
-    this.tableClass = this.grid.getSetting('attr.class');
-    this.isHideHeader = this.grid.getSetting('hideHeader');
-    this.isHideSubHeader = this.grid.getSetting('hideSubHeader');
-    this.isPagerDisplay = this.grid.getSetting('pager.display');
-    this.isPagerDisplay = this.grid.getSetting('pager.display');
-    this.perPageSelect = this.grid.getSetting('pager.perPageSelect');
-    this.rowClassFunction = this.grid.getSetting('rowClassFunction');
+    this.tableId = this.grid.getSetting().attr.id;
+    this.tableClass = this.grid.getSetting().attr.class;
+    this.isHideHeader = this.grid.getSetting().hideHeader;
+    this.isHideSubHeader = this.grid.getSetting().hideSubHeader;
+    this.isPagerDisplay = this.grid.getSetting().pager.display;
+    this.perPageSelect = this.grid.getSetting().pager.perPage;
+    this.rowClassFunction = this.grid.getSetting().rowClassFunction;
   }
 
   editRowSelect(row: Row) {
-    if (this.grid.getSetting('selectMode') === 'multi') {
+    if (this.grid.getSetting().selectMode === 'multi') {
       this.onMultipleSelectRow(row);
     } else {
       this.onSelectRow(row);
@@ -117,7 +68,7 @@ export class Ng2SmartTableComponent implements OnChanges {
   }
 
   onUserSelectRow(row: Row) {
-    if (this.grid.getSetting('selectMode') !== 'multi') {
+    if (this.grid.getSetting().selectMode === 'multi') {
       this.grid.selectRow(row);
       this.emitUserSelectRow(row);
       this.emitSelectRow(row);
@@ -167,8 +118,8 @@ export class Ng2SmartTableComponent implements OnChanges {
     return new LocalDataSource();
   }
 
-  prepareSettings(): Object {
-    return deepExtend({}, this.defaultSettings, this.settings);
+  prepareSettings(): SettingsClass {
+    return deepExtend({}, new SettingsClass().default(), this.settings);
   }
 
   changePage($event: any) {

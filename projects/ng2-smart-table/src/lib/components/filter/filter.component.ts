@@ -6,26 +6,26 @@ import { Subscription } from 'rxjs';
   selector: 'ng2-smart-table-filter',
   styleUrls: ['./filter.component.scss'],
   template: `
-      <div class="ng2-smart-filter" *ngIf="column.isFilterable" [ngSwitch]="column.getFilterType()">
-        <custom-table-filter *ngSwitchCase="'custom'"
-                             [query]="query"
-                             [column]="column"
-                             [source]="source"
-                             [inputClass]="inputClass"
-                             (filter)="onFilter($event)">
-        </custom-table-filter>
-        <default-table-filter *ngSwitchDefault
-                              [query]="query"
-                              [column]="column"
-                              [source]="source"
-                              [inputClass]="inputClass"
-                              (filter)="onFilter($event)">
-        </default-table-filter>
-      </div>
-    `,
+		<div class="ng2-smart-filter" *ngIf="column.filter" [ngSwitch]="column.getFilterType()">
+			<custom-table-filter *ngSwitchCase="'custom'"
+			                     [query]="query"
+			                     [column]="column"
+			                     [source]="source"
+			                     [inputClass]="inputClass"
+			                     (filter)="onFilter($event)">
+			</custom-table-filter>
+			<default-table-filter *ngSwitchDefault
+			                      [query]="query"
+			                      [column]="column"
+			                      [source]="source"
+			                      [inputClass]="inputClass"
+			                      (filter)="onFilter($event)">
+			</default-table-filter>
+		</div>
+  `
 })
 export class FilterComponent extends FilterDefault implements OnChanges {
-  query: string = '';
+  query = '';
   protected dataChangedSub: Subscription;
 
   ngOnChanges(changes: SimpleChanges) {
@@ -33,19 +33,13 @@ export class FilterComponent extends FilterDefault implements OnChanges {
       if (!changes.source.firstChange) {
         this.dataChangedSub.unsubscribe();
       }
-      this.dataChangedSub = this.source.onChanged().subscribe((dataChanges) => {
+      this.dataChangedSub = this.source.onChanged.subscribe(() => {
         const filterConf = this.source.getFilter();
-        if (filterConf && filterConf.filters && filterConf.filters.length === 0) {
+        if (!filterConf || !filterConf.filters || !filterConf.filters.length) {
           this.query = '';
-
-          // add a check for existing filters an set the query if one exists for this column
-          // this covers instances where the filter is set by user code while maintaining existing functionality
-        } else if (filterConf && filterConf.filters && filterConf.filters.length > 0) {
-          filterConf.filters.forEach((k: any, v: any) => {
-            if (k.field == this.column.id) {
-              this.query = k.search;
-            }
-          });
+        } else {
+          const filter = filterConf.filters.find(f => f.field === this.column.id);
+          this.query = filter ? filter.search : '';
         }
       });
     }

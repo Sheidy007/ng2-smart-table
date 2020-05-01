@@ -1,4 +1,4 @@
-<table [id]="tableId" [ngClass]="tableClass">
+<table *ngIf="settings" [id]="tableId" [ngClass]="tableClass">
 
   <thead ng2-st-thead *ngIf="!isHideHeader || !isHideSubHeader"
                       [grid]="grid"
@@ -27,7 +27,7 @@
 
 </table>
 
-<ng2-smart-table-pager *ngIf="isPagerDisplay"
+<ng2-smart-table-pager *ngIf="isPagerDisplay && settings"
                         [source]="source"
                         [perPageSelect]="perPageSelect"
                         (changePage)="changePage($event)">
