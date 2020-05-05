@@ -1,6 +1,6 @@
 <cdk-virtual-scroll-viewport
-		[itemSize]="itemSize"
-		[ngStyle]="{minHeight: minHeight}"
+		[itemSize]="rowHeight"
+		[ngStyle]="{minHeight: minTableHeight}"
 		[perfectScrollbar]
 		(psScrollY)="onScroll()">
 	<perfect-scrollbar>

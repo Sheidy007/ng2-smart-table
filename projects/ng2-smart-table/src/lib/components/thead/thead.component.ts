@@ -8,11 +8,11 @@ import { LocalDataSource } from '../../lib/data-source/local.data-source';
     templateUrl: './thead.component.html',
 })
 export class Ng2SmartTableTheadComponent implements OnChanges {
-
     @Input() grid: Grid;
     @Input() source: LocalDataSource;
     @Input() isAllSelected: boolean;
     @Input() createConfirm: EventEmitter<any>;
+    @Input() minColumnWidth: number;
 
     @Output() sort = new EventEmitter<any>();
     @Output() selectAllRows = new EventEmitter<any>();

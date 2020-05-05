@@ -14,8 +14,9 @@ export class Ng2SmartTableComponent implements OnChanges {
 
   @Input() source: LocalDataSource | any;
   @Input() settings: SettingsClass;
-  @Input() itemSize = 25;
-  @Input() minHeight = '300px';
+  @Input() minTableHeight = '300px';
+  @Input() rowHeight = 25;
+  @Input() minColumnWidth = 5;
 
   @Output() rowSelect = new EventEmitter<any>();
   @Output() userRowSelect = new EventEmitter<any>();

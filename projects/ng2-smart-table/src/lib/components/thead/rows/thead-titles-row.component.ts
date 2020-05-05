@@ -31,7 +31,7 @@ import { Column } from 'ng2-smart-table';
 			    [style.position]="'relative'"
 			    class="ng2-smart-th {{ column.id }}"
 			    (mousedown)="grid.doDrgDrop = true"
-          (mouseup)="grid.doDrgDrop = false">
+			    (mouseup)="grid.doDrgDrop = false">
 				<ng2-st-column-title [settings]="grid.getSetting()"
 				                     [source]="source"
 				                     [column]="column"
@@ -51,7 +51,7 @@ import { Column } from 'ng2-smart-table';
                    right: 0;
                    bottom: 0;
                    width: 2px;
-                   z-index: 9999;
+                   z-index: 2;
                    cursor: col-resize;
                    background-color: black;
                }`]
@@ -61,6 +61,7 @@ export class TheadTitlesRowComponent implements OnChanges {
   @Input() grid: Grid;
   @Input() isAllSelected: boolean;
   @Input() source: LocalDataSource;
+  @Input() minColumnWidth: number;
 
   @Output() sort = new EventEmitter<any>();
   @Output() selectAllRows = new EventEmitter<any>();
@@ -70,7 +71,8 @@ export class TheadTitlesRowComponent implements OnChanges {
   showActionColumnRight: boolean;
   oldWidth = 0;
   oldPercent = 0;
-  oldWidthNext = 0;
+  oldWidthNext = [];
+  oldWidthPrev = [];
   startPosX = 0;
   timer: Subscription;
 
@@ -90,13 +92,9 @@ export class TheadTitlesRowComponent implements OnChanges {
   resize(event: Event, column: Column) {
     event.stopPropagation();
     const el = (event.target as HTMLElement).parentElement;
-    this.oldWidth = el.clientWidth;
-    this.oldPercent = parseInt(el.style.width, 10);
     let columns = this.grid.getColumns();
     const id = columns.indexOf(column);
-    if (columns[id + 1]) {
-      this.oldWidthNext = parseInt(columns[id + 1].width, 10);
-    }
+    this.setPreResize(event, el, columns, id);
 
     const evUp = fromEvent(window, 'mouseup').subscribe((e: MouseEvent) => {
       if (this.timer) {
@@ -110,13 +108,14 @@ export class TheadTitlesRowComponent implements OnChanges {
       });
       columns.forEach((col) => {
         let w = Math.round(100 / widthSum * parseInt(col.width, 10));
-        w = w > 5 ? w : 5;
+        w = w > this.minColumnWidth ? w : this.minColumnWidth;
         col.width = w + '%';
       });
       this.grid.getDataSet().setSettings();
       evUp.unsubscribe();
       evMove.unsubscribe();
     });
+
     const evMove = fromEvent(window, 'mousemove').subscribe((e: MouseEvent) => {
       if (this.timer) {
         this.timer.unsubscribe();
@@ -127,22 +126,120 @@ export class TheadTitlesRowComponent implements OnChanges {
     });
   }
 
+  setPreResize(e, el, columns, id) {
+    this.startPosX = e.screenX;
+    this.oldWidth = el.clientWidth;
+    this.oldPercent = parseInt(el.style.width, 10);
+    let i = 1;
+    this.oldWidthNext = [];
+    while (columns[id + i]) {
+      this.oldWidthNext.push(parseInt(columns[id + i].width, 10));
+      i++;
+    }
+    this.oldWidthPrev = [];
+    i = 1;
+    while (columns[id - i]) {
+      this.oldWidthPrev.push(parseInt(columns[id - i].width, 10));
+      i++;
+    }
+  }
+
   makeResize(e: MouseEvent, column: Column) {
     if (!this.grid.doResize) {
       this.startPosX = e.screenX;
       this.grid.doResize = true;
     }
 
-    let result = this.oldWidth + (e.screenX - this.startPosX);
-    result = this.oldPercent * result / this.oldWidth;
-    result = result < 5 ? 5 : result;
+    const newWidth = this.oldWidth + (e.screenX - this.startPosX);
+    const thisNewPercent = this.oldPercent * newWidth / this.oldWidth;
     const columns = this.grid.getColumns();
     const id = columns.indexOf(column);
-    if (this.oldPercent !== result) {
-      if (columns[id + 1]) {
-        columns[id + 1].width = this.oldWidthNext + (this.oldPercent - result) + '%';
+
+    let sumRight = 0;
+    let exclude = true;
+    this.oldWidthNext.forEach(o => {
+      if (o > this.minColumnWidth) {
+        exclude = false;
+      }
+      if (!exclude || o > this.minColumnWidth) {
+        sumRight += o;
+      }
+    });
+
+    let sumLeft = 0;
+    exclude = true;
+    this.oldWidthPrev.forEach(o => {
+      if (o > this.minColumnWidth) {
+        exclude = false;
+      }
+      if (!exclude || o > this.minColumnWidth) {
+        sumLeft += o;
+      }
+    });
+    const nextForLeft = this.oldWidthNext[0];
+
+    if (thisNewPercent > this.oldPercent) {
+      if (sumRight > 0) {
+        let needDiff = thisNewPercent - this.oldPercent;
+        let realDiff = 0;
+        for (let i = 0; i < this.oldWidthNext.length; i++) {
+          if (this.oldWidthNext[i] !== this.minColumnWidth && needDiff > 0) {
+            if (this.oldWidthNext[i] - needDiff > this.minColumnWidth) {
+              realDiff += needDiff;
+              columns[id + i + 1].width = this.oldWidthNext[i] - needDiff + '%';
+              needDiff = 0;
+              break;
+            } else {
+              realDiff += this.oldWidthNext[i] - this.minColumnWidth;
+              needDiff -= this.oldWidthNext[i] - this.minColumnWidth;
+              if (columns[id + i + 1].width !== this.minColumnWidth + '%') {
+                columns[id + i + 1].width = this.minColumnWidth + '%';
+              }
+            }
+          }
+        }
+        column.width = this.oldPercent + realDiff + '%';
       }
     }
-    column.width = result + '%';
+
+    if (thisNewPercent < this.oldPercent && nextForLeft) {
+      if (sumLeft > 0) {
+        let needDiff = this.oldPercent - thisNewPercent;
+        let realDiff = 0;
+
+        if (thisNewPercent > this.minColumnWidth) {
+          realDiff += needDiff;
+          column.width = thisNewPercent + '%';
+          needDiff = 0;
+        } else {
+          realDiff = this.oldPercent - this.minColumnWidth;
+          needDiff = this.minColumnWidth - thisNewPercent;
+          if (column.width !== this.minColumnWidth + '%') {
+            column.width = this.minColumnWidth + '%';
+          }
+        }
+
+        if (needDiff > 0) {
+          for (let i = 0; i < this.oldWidthPrev.length; i++) {
+            if (this.oldWidthPrev[i] !== this.minColumnWidth && needDiff > 0) {
+              if (this.oldWidthPrev[i] - needDiff > this.minColumnWidth) {
+                realDiff += needDiff;
+                columns[id - i - 1].width = this.oldWidthPrev[i] - needDiff + '%';
+                needDiff = 0;
+                break;
+              } else {
+                realDiff += this.oldWidthPrev[i] - this.minColumnWidth;
+                needDiff -= this.oldWidthPrev[i] - this.minColumnWidth;
+
+                if (columns[id - i - 1].width !== this.minColumnWidth + '%') {
+                  columns[id - i - 1].width = this.minColumnWidth + '%';
+                }
+              }
+            }
+          }
+        }
+        columns[id + 1].width = nextForLeft + realDiff + '%';
+      }
+    }
   }
 }

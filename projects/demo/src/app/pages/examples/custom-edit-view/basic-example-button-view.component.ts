@@ -1,11 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ViewCell } from 'ng2-smart-table';
 
 @Component({
   selector: 'button-view',
   template: `
-    <button (click)="onClick()">{{ renderValue }}</button>
-  `,
+		<button (click)="onClick()" style="white-space: nowrap">{{ renderValue }}</button>
+  `
 })
 export class ButtonViewComponent implements ViewCell, OnInit {
   renderValue: string;

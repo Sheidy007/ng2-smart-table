@@ -10,11 +10,11 @@ export class DataSet {
   protected selectedRow: Row;
   protected needSelect: 'first' | 'last' | '' = 'first';
 
-  settingsForReset = {};
+  settingsForReset = null;
 
   constructor(protected data: any[] = [], protected columnSettings: any, protected settingsName: string) {
     const tablesSettingsJson = localStorage.getItem('tablesSettings');
-    let addedSettings = {};
+    let addedSettings = null;
     if (tablesSettingsJson) {
       addedSettings = JSON.parse(tablesSettingsJson);
     }
@@ -26,6 +26,7 @@ export class DataSet {
   // create
 
   createColumns(columnsSettings: any, settingsName: string, addedSettings: any) {
+
     const oneColumnWidth = 100 / Object.keys(columnsSettings).length;
     let widthSum = 0;
     Object.keys(columnsSettings).forEach((key) => {
@@ -41,7 +42,10 @@ export class DataSet {
       columnsSettings[key].width = Math.round(100 / widthSum * parseInt(columnsSettings[key].width, 10)) + '%';
     });
 
-    this.setSettingsForReset(columnsSettings, settingsName);
+    if (!this.settingsForReset) {
+      this.settingsForReset = {};
+      this.setSettingsForReset(columnsSettings, settingsName);
+    }
 
     if (settingsName && addedSettings) {
       if (addedSettings[settingsName]) {
@@ -90,7 +94,8 @@ export class DataSet {
     for (const id in columnsSettings) {
       if (columnsSettings.hasOwnProperty(id)) {
         const colForSave = {};
-        const col = new Column(id, columnsSettings[id]);
+        const col = columnsSettings[id];
+        colForSave['id'] = id;
         Object.keys(col).forEach(key => {
           if (typeof col[key] === 'string' ||
             typeof col[key] === 'number' ||
