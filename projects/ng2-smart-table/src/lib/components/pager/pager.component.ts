@@ -1,138 +1,145 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-import { DataSource } from '../../lib/data-source/data-source';
-import { DataSourceClass } from '../../lib/data-source/data-source.class';
+import { PagingClass } from '../../lib/data-source/data-source.class';
+import { Grid } from '../../lib/grid';
+import { LocalDataSource } from '../../lib/data-source/local.data-source';
 
 @Component({
   selector: 'ng2-smart-table-pager',
   styleUrls: ['./pager.component.scss'],
   template: `
-		<nav *ngIf="shouldShow()" class="ng2-smart-pagination-nav">
+		<nav *ngIf="shouldShow()"
+		     class="ng2-smart-pagination-nav">
 			<ul class="ng2-smart-pagination pagination">
-				<li class="ng2-smart-page-item page-item" [ngClass]="{disabled: getPage() == 1}">
-					<a class="ng2-smart-page-link page-link" href="#"
-					   (click)="getPage() == 1 ? false : paginate(1)" aria-label="First">
-						<span aria-hidden="true">&laquo;</span>
-						<span class="sr-only">First</span>
-					</a>
+				<li [ngClass]="{disabled: getPage() == 1}"
+				    class="ng2-smart-page-item page-item">
+					<button (click)="paginate(1)"
+					        aria-label="First"
+					        class="ng2-smart-page-link page-link"
+					>
+						&laquo;
+					</button>
 				</li>
 				<li class="ng2-smart-page-item page-item" [ngClass]="{disabled: getPage() == 1}">
-					<a class="ng2-smart-page-link page-link page-link-prev" href="#"
-					   (click)="getPage() == 1 ? false : prev()" aria-label="Prev">
-						<span aria-hidden="true">&lt;</span>
-						<span class="sr-only">Prev</span>
-					</a>
+					<button (click)="prev()"
+					        aria-label="Prev"
+					        class="ng2-smart-page-link page-link page-link-prev">
+						&lt;
+					</button>
 				</li>
-				<li class="ng2-smart-page-item page-item"
-				    [ngClass]="{active: getPage() == page}" *ngFor="let page of getPages()">
-          <span class="ng2-smart-page-link page-link"
-                *ngIf="getPage() == page">{{ page }} <span class="sr-only">(current)</span></span>
-					<a class="ng2-smart-page-link page-link" href="#"
-					   (click)="paginate(page)" *ngIf="getPage() != page">{{ page }}</a>
+				<li *ngFor="let page of getPages()"
+				    [ngClass]="{active: getPage() == page}"
+				    class="ng2-smart-page-item page-item">
+          <span *ngIf="getPage() == page"
+                class="ng2-smart-page-link page-link">
+            {{ page }}
+          </span>
+					<button (click)="paginate(page)" *ngIf="getPage() != page"
+					        class="ng2-smart-page-link page-link">
+						{{ page }}
+					</button>
 				</li>
 				<li class="ng2-smart-page-item page-item"
 				    [ngClass]="{disabled: getPage() == getLast()}">
-					<a class="ng2-smart-page-link page-link page-link-next" href="#"
-					   (click)="getPage() == getLast() ? false : next()" aria-label="Next">
-						<span aria-hidden="true">&gt;</span>
-						<span class="sr-only">Next</span>
-					</a>
+					<button (click)="next()"
+					        aria-label="Next"
+					        class="ng2-smart-page-link page-link page-link-next">
+						&gt;
+					</button>
 				</li>
 				<li class="ng2-smart-page-item page-item"
 				    [ngClass]="{disabled: getPage() == getLast()}">
-					<a class="ng2-smart-page-link page-link" href="#"
-					   (click)="getPage() == getLast() ? false : paginate(getLast())" aria-label="Last">
-						<span aria-hidden="true">&raquo;</span>
-						<span class="sr-only">Last</span>
-					</a>
+					<button class="ng2-smart-page-link page-link"
+					        (click)="paginate(getLast())" aria-label="Last">
+						&raquo;
+					</button>
 				</li>
 			</ul>
 		</nav>
-		<nav *ngIf="perPageSelect && perPageSelect.length" class="ng2-smart-pagination-per-page">
-			<label for="per-page">
+		<nav *ngIf="this.pageConf  && perPageSettings && perPageSettings['length']"
+		     class="ng2-smart-pagination-per-page">
+			<label>
 				Per Page:
 			</label>
-			<select (change)="onChangePerPage($event)"
-			        [(ngModel)]="currentPerPage"
-			        id="per-page">
-				<option *ngFor="let item of perPageSelect"
+			<select (change)="onChangePerPage()"
+			        [(ngModel)]="this.pageConf.perPage">
+				<option *ngFor="let item of perPageSettingsArray"
 				        [value]="item">
 					{{ item }}
 				</option>
 			</select>
 		</nav>
+		<button (click)="reSetSettings()">reset settings</button>
   `
 })
-export class PagerComponent implements OnChanges {
-
-  @Input() source: DataSource;
-  @Input() perPageSelect: any[] = [];
+export class PagerComponent implements OnInit {
+  @Input() source: LocalDataSource;
+  @Input() grid: Grid;
+  @Input() perPageSettings: number | number[] = [];
 
   @Output() changePage = new EventEmitter<any>();
 
-  currentPerPage: any;
-
+  pageConf: PagingClass;
   protected pages: number[];
-  protected page: number;
   protected count = 0;
-  protected perPage: number;
 
-  protected dataChangedSub: Subscription;
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes.source) {
-      if (!changes.source.firstChange) {
-        this.dataChangedSub.unsubscribe();
-      }
-      this.dataChangedSub = this.source.onChanged.subscribe((dataChanges) => {
-        this.page = this.source.getPaging().page;
-        this.perPage = this.source.getPaging().perPage;
-        this.currentPerPage = this.perPage;
-        this.count = this.source.count();
-        if (this.isPageOutOfBounce()) {
-          this.source.setPage(--this.page);
-        }
-
-        this.processPageChange(dataChanges);
-        this.initPages();
-      });
-    }
+  get perPageSettingsArray(): number[] {
+    return this.perPageSettings as number[];
   }
 
-  /**
-   * We change the page here depending on the action performed against data source
-   * if a new element was added to the end of the table - then change the page to the last
-   * if a new element was added to the beginning of the table - then to the first page
-   * @param changes contain changes
-   */
-  processPageChange(changes: DataSourceClass) {
-    if (['prepend', 'append'].includes(changes.action)) {
-      this.source.setPage(changes.action === 'prepend' ? 1 : this.getLast());
-    }
+  constructor(private ref: ChangeDetectorRef) {
+
+  }
+
+  ngOnInit() {
+    this.pageConf = this.grid.pagingSource.getPaging();
+
+    this.grid.pagingSource.onChanged.subscribe(() => {
+      this.initPages();
+    });
+    this.source.onChanged.subscribe((dataChanges) => {
+      this.count = this.source.count();
+      if (this.isPageOutOfBounce()) {
+        this.grid.pagingSource.setPageByUser(--this.pageConf.page);
+      }
+      if (['prepend', 'append'].includes(dataChanges.action)) {
+        this.grid.pagingSource
+          .setPageByUser(dataChanges.action === 'prepend' ? 1 : this.getLast());
+      }
+      this.initPages();
+    });
   }
 
   shouldShow(): boolean {
-    return this.source.count() > this.perPage;
+    if (!this.pageConf || !this.perPageSettings) {return false; }
+    return this.source.countAll() > this.pageConf.perPage;
+  }
+
+  onChangePerPage() {
+    if (this.source && this.pageConf) {
+      this.grid.pagingSource.setPaging(1, this.pageConf.perPage as number, true);
+    }
   }
 
   paginate(page: number): boolean {
-    this.source.setPage(page);
-    this.page = page;
+    if (page === this.pageConf.page) { return false; }
+    this.grid.pagingSource.setPageByUser(page);
     this.changePage.emit({ page });
-    return false;
+    return true;
   }
 
   next(): boolean {
+    if (this.getPage() === this.getLast()) { return false; }
     return this.paginate(this.getPage() + 1);
   }
 
   prev(): boolean {
+    if (this.getPage() === 1) { return false; }
     return this.paginate(this.getPage() - 1);
   }
 
   getPage(): number {
-    return this.page;
+    return this.pageConf.page;
   }
 
   getPages(): Array<any> {
@@ -140,11 +147,13 @@ export class PagerComponent implements OnChanges {
   }
 
   getLast(): number {
-    return Math.ceil(this.count / this.perPage);
+    const perPage = this.pageConf.perPage as number;
+    return Math.ceil(this.count / perPage);
   }
 
   isPageOutOfBounce(): boolean {
-    return (this.page * this.perPage) >= (this.count + this.perPage) && this.page > 1;
+    const perPage = this.pageConf.perPage as number;
+    return (this.pageConf.page * perPage) >= (this.count + perPage) && this.pageConf.page > 1;
   }
 
   initPages() {
@@ -156,7 +165,7 @@ export class PagerComponent implements OnChanges {
     if (this.shouldShow()) {
 
       let middleOne = Math.ceil(showPagesCount / 2);
-      middleOne = this.page >= middleOne ? this.page : middleOne;
+      middleOne = this.pageConf.page >= middleOne ? this.pageConf.page : middleOne;
 
       let lastOne = middleOne + Math.floor(showPagesCount / 2);
       lastOne = lastOne >= pagesCount ? pagesCount : lastOne;
@@ -167,14 +176,11 @@ export class PagerComponent implements OnChanges {
         this.pages.push(i);
       }
     }
+
+    this.ref.detectChanges();
   }
 
-  onChangePerPage(event: any) {
-    if (this.currentPerPage) {
-      this.source.getPaging().perPage = this.currentPerPage ? this.currentPerPage : null;
-      this.source.refresh();
-      this.initPages();
-    }
+  reSetSettings() {
+    this.grid.getDataSet().resetSettings();
   }
-
 }

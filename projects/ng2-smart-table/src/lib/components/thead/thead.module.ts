@@ -2,8 +2,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { FilterModule } from '../filter/filter.module';
-import { CellModule } from '../cell/cell.module';
+import { FilterModule } from './filter/filter.module';
+import { CellModule } from '../tbody/cells/cell/cell.module';
 
 import { Ng2SmartTableTheadComponent } from './thead.component';
 import { ActionsComponent } from './cells/actions.component';
@@ -15,6 +15,7 @@ import { TitleComponent } from './cells/title/title.component';
 import { TheadFiltersRowComponent } from './rows/thead-filters-row.component';
 import { TheadFormRowComponent } from './rows/thead-form-row.component';
 import { TheadTitlesRowComponent } from './rows/thead-titles-row.component';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 const THEAD_COMPONENTS = [
   ActionsComponent,
@@ -35,6 +36,7 @@ const THEAD_COMPONENTS = [
     FormsModule,
     FilterModule,
     CellModule,
+    DragDropModule
   ],
   declarations: [
     ...THEAD_COMPONENTS,

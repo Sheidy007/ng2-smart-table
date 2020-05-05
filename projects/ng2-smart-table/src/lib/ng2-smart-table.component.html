@@ -1,6 +1,8 @@
-<table *ngIf="settings" [id]="tableId" [ngClass]="tableClass">
-
-  <thead ng2-st-thead *ngIf="!isHideHeader || !isHideSubHeader"
+<div *ngIf="settings"
+     [id]="tableId"
+     [ngClass]="[tableClass,
+      grid.doResize?'user-select-none':'']">
+  <div ng2-st-thead *ngIf="!isHideHeader || !isHideSubHeader"
                       [grid]="grid"
                       [isAllSelected]="isAllSelected"
                       [source]="source"
@@ -9,13 +11,15 @@
                       (selectAllRows)="onSelectAllRows($event)"
                       (sort)="sort($event)"
                       (filter)="filter($event)">
-  </thead>
+  </div>
 
-  <tbody ng2-st-tbody [grid]="grid"
+  <div ng2-st-tbody   [grid]="grid"
                       [source]="source"
                       [deleteConfirm]="deleteConfirm"
                       [editConfirm]="editConfirm"
                       [rowClassFunction]="rowClassFunction"
+                      [itemSize]="itemSize"
+                      [minHeight]="minHeight"
                       (edit)="edit.emit($event)"
                       (delete)="delete.emit($event)"
                       (custom)="custom.emit($event)"
@@ -23,12 +27,14 @@
                       (editRowSelect)="editRowSelect($event)"
                       (multipleSelectRow)="multipleSelectRow($event)"
                       (rowHover)="onRowHover($event)">
-  </tbody>
+  </div>
 
-</table>
+  <ng2-smart-table-pager *ngIf="isPagerDisplay && settings"
+                         [source]="source"
+                         [grid]="grid"
+                         [perPageSettings]="perPageSettings"
+                         (changePage)="changePage($event)">
+  </ng2-smart-table-pager>
+</div>
 
-<ng2-smart-table-pager *ngIf="isPagerDisplay && settings"
-                        [source]="source"
-                        [perPageSelect]="perPageSelect"
-                        (changePage)="changePage($event)">
-</ng2-smart-table-pager>
+

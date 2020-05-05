@@ -1,6 +1,6 @@
 import { DataSet } from './data-set';
 import { ViewCell } from 'ng2-smart-table';
-import { FilterConfigClass } from '../../components/filter/filter.class';
+import { FilterOrEditConfigClass } from '../../components/thead/filter/filter.class';
 
 export class Column {
 
@@ -8,16 +8,19 @@ export class Column {
   type: 'html' | 'custom' | 'text' = 'text';
   class = '';
   width = '';
-  sort = false;
-  multiCompare = false;
+  sort = true;
   defaultSortDirection: 'desc' | 'asc' | '' = '';
   editable = true;
   addable = true;
-  editor: { type: string, config: any, component: any }
-    = { type: '', config: {}, component: null };
+  editor: {
+    type: 'custom' | 'completer' | 'checkbox' | 'list' | 'textarea' | 'default', config: FilterOrEditConfigClass, component: any
+  }
+    = { type: 'default', config: {}, component: null };
 
-  filter: { type: 'custom' | 'default', config: FilterConfigClass, component: any }
-    = { type: 'default', config: new FilterConfigClass(), component: null };
+  filter: {
+    type: 'custom' | 'completer' | 'checkbox' | 'list' | 'textarea' | 'default', config: FilterOrEditConfigClass, component: any
+  }
+    = { type: 'default', config: new FilterOrEditConfigClass(), component: null };
 
   renderComponent: any = null;
 
@@ -26,12 +29,12 @@ export class Column {
   filterFunction: () => boolean = null;
 
   onComponentInitFunction: () => ViewCell = null;
-
-  constructor(public id: string, protected columnSettings: Column, protected dataSet: DataSet) {
-    this.process();
+  defaultValue = '';
+  constructor(public id: string, columnSettings: Column) {
+    this.process(columnSettings);
   }
 
-  getOnComponentInitFunction(): () => ViewCell {
+  getOnComponentInitFunction(): (...attr) => ViewCell {
     return this.onComponentInitFunction;
   }
 
@@ -47,37 +50,19 @@ export class Column {
     return this.filterFunction;
   }
 
-  getConfig(): any {
+  getConfig(): FilterOrEditConfigClass {
     return this.editor && this.editor.config;
   }
 
-  getFilterType(): 'custom' | 'default' {
+  getFilterType(): 'custom' | 'completer' | 'checkbox' | 'list' | 'textarea' | 'default' {
     return this.filter ? this.filter.type : 'default';
   }
 
-  getFilterConfig(): FilterConfigClass {
-    return this.filter ? this.filter.config : new FilterConfigClass();
+  getFilterConfig(): FilterOrEditConfigClass {
+    return this.filter ? this.filter.config : new FilterOrEditConfigClass();
   }
 
-  protected process() {
-    [
-      'title'
-      , 'class'
-      , 'width'
-      , 'editor'
-      , 'filter'
-      , 'sort'
-      , 'multiCompare'
-      , 'editable'
-      , 'addable'
-      , 'renderComponent'
-      , 'compareFunction'
-      , 'valuePrepareFunction'
-      , 'filterFunction'
-      , 'onComponentInitFunction'
-      , 'defaultSortDirection'
-    ].forEach(
-      field => this[field] = this.columnSettings[field] ? this.columnSettings[field] : this[field]
-    );
+  protected process(columnSettings: Column) {
+    Object.keys(columnSettings).forEach(key => this[key] = columnSettings[key]);
   }
 }

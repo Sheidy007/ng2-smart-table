@@ -1,8 +1,13 @@
 export * from './lib/ng2-smart-table.module';
-export { ViewCell } from './lib/components/cell/cell-view-mode/view-cell';
-export { DefaultEditor, Editor } from './lib/components/cell/cell-editors/default-editor';
-export { DefaultFilter, Filter } from './lib/components/filter/filter-types/default-filter'
+export { ViewCell } from './lib/components/tbody/cells/cell/cell-view-mode/view-cell';
+export { DefaultEditor, Editor } from './lib/components/tbody/cells/cell/cell-editors/default-editor';
+export { DefaultFilter, Filter } from './lib/components/thead/filter/filter-types/default-filter';
 export { Cell } from './lib/lib/data-set/cell';
-export { LocalDataSource } from './lib/lib/data-source/local/local.data-source';
-export { ServerDataSource } from './lib/lib/data-source/server/server.data-source';
+export { Column } from './lib/lib/data-set/column';
+export { Grid } from './lib/lib/grid';
+export { LocalDataSource } from './lib/lib/data-source/local.data-source';
+export { SettingsClass } from './lib/lib/settings.class';
+export { FilterSourceClass } from './lib/lib/data-source/filter-source.class';
+export { SorterSourceClass } from './lib/lib/data-source/sorter-source.class';
+export { PagingSourceClass } from './lib/lib/paging-source-class';
 export * from './lib/ng2-smart-table.component';

@@ -1,9 +1,10 @@
 export class DataSourceClass {
-  action: 'refresh' |
+  action?: 'refresh' |
     'load' |
     'prepend' |
     'append' |
     'add' |
+    'unshift' |
     'remove' |
     'update' |
     'updateField' |
@@ -12,21 +13,21 @@ export class DataSourceClass {
     'filter' |
     'paging' |
     'page';
-  elements: any;
-  paging: PagingClass;
-  filter: FilterConfClass;
-  sort: SortClass[];
+  elements?: any;
+  paging?: PagingClass;
+  filter?: FilterConfClass;
+  sort?: SortConfClass;
 }
 
 export class PagingClass {
   page: number;
-  perPage: number;
+  perPage: number | number[];
 }
 
 export class FilterClass {
   field: string;
   search: string;
-  filter: () => boolean;
+  filter?: () => boolean;
 }
 
 export class FilterConfClass {

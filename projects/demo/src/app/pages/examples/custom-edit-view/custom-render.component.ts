@@ -4,8 +4,8 @@ import { ViewCell } from 'ng2-smart-table';
 
 @Component({
   template: `
-    {{renderValue}}
-  `,
+		{{renderValue}}
+  `
 })
 export class CustomRenderComponent implements ViewCell, OnInit {
 

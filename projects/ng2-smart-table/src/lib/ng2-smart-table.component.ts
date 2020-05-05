@@ -1,28 +1,28 @@
-import { Component, Input, Output, SimpleChange, EventEmitter, OnChanges } from '@angular/core';
-
-import { Grid } from './lib/grid';
-import { DataSource } from './lib/data-source/data-source';
-import { Row } from './lib/data-set/row';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChange } from '@angular/core';
 import { deepExtend } from './lib/helpers';
-import { LocalDataSource } from './lib/data-source/local/local.data-source';
-import { SettingsClass } from './lib/settings.class';
+import { Grid } from './lib/grid';
+import { Row } from './lib/data-set/row';
+import { LocalDataSource } from './lib/data-source/local.data-source';
+import { CustomActionResultClass, SettingsClass } from './lib/settings.class';
 
 @Component({
   selector: 'ng2-smart-table',
   styleUrls: ['./ng2-smart-table.component.scss'],
-  templateUrl: './ng2-smart-table.component.html',
+  templateUrl: './ng2-smart-table.component.html'
 })
 export class Ng2SmartTableComponent implements OnChanges {
 
-  @Input() source: any;
+  @Input() source: LocalDataSource | any;
   @Input() settings: SettingsClass;
+  @Input() itemSize = 25;
+  @Input() minHeight = '300px';
 
   @Output() rowSelect = new EventEmitter<any>();
   @Output() userRowSelect = new EventEmitter<any>();
   @Output() delete = new EventEmitter<any>();
   @Output() edit = new EventEmitter<any>();
   @Output() create = new EventEmitter<any>();
-  @Output() custom = new EventEmitter<any>();
+  @Output() custom = new EventEmitter<CustomActionResultClass>();
   @Output() deleteConfirm = new EventEmitter<any>();
   @Output() editConfirm = new EventEmitter<any>();
   @Output() createConfirm = new EventEmitter<any>();
@@ -30,7 +30,7 @@ export class Ng2SmartTableComponent implements OnChanges {
 
   tableClass: string;
   tableId: string;
-  perPageSelect: any;
+  perPageSettings: number | number[];
   isHideHeader: boolean;
   isHideSubHeader: boolean;
   isPagerDisplay: boolean;
@@ -55,7 +55,7 @@ export class Ng2SmartTableComponent implements OnChanges {
     this.isHideHeader = this.grid.getSetting().hideHeader;
     this.isHideSubHeader = this.grid.getSetting().hideSubHeader;
     this.isPagerDisplay = this.grid.getSetting().pager.display;
-    this.perPageSelect = this.grid.getSetting().pager.perPage;
+    this.perPageSettings = this.grid.getSetting().pager.perPage;
     this.rowClassFunction = this.grid.getSetting().rowClassFunction;
   }
 
@@ -68,8 +68,15 @@ export class Ng2SmartTableComponent implements OnChanges {
   }
 
   onUserSelectRow(row: Row) {
-    if (this.grid.getSetting().selectMode === 'multi') {
+    if (this.grid.getSetting().selectMode !== 'multi') {
       this.grid.selectRow(row);
+      this.emitUserSelectRow(row);
+      this.emitSelectRow(row);
+    }
+  }
+  multipleSelectRow(row: Row) {
+    if (this.grid.getSetting().selectMode === 'multi') {
+      this.grid.multipleSelectRow(row);
       this.emitUserSelectRow(row);
       this.emitSelectRow(row);
     }
@@ -77,12 +84,6 @@ export class Ng2SmartTableComponent implements OnChanges {
 
   onRowHover(row: Row) {
     this.rowHover.emit(row);
-  }
-
-  multipleSelectRow(row: Row) {
-    this.grid.multipleSelectRow(row);
-    this.emitUserSelectRow(row);
-    this.emitSelectRow(row);
   }
 
   onSelectAllRows($event: any) {
@@ -104,22 +105,22 @@ export class Ng2SmartTableComponent implements OnChanges {
 
   initGrid() {
     this.source = this.prepareSource();
-    this.grid = new Grid(this.source, this.prepareSettings());
-    this.grid.onSelectRow().subscribe((row) => this.emitSelectRow(row));
+    this.settings = this.prepareSettings();
+    this.grid = new Grid(this.settings, this.source);
+    this.grid.onSelectRowSource.subscribe((row) => this.emitSelectRow(row));
   }
 
-  prepareSource(): DataSource {
-    if (this.source instanceof DataSource) {
+  prepareSource(): LocalDataSource {
+    if (this.source instanceof LocalDataSource) {
       return this.source;
-    } else if (this.source instanceof Array) {
+    } else if (this.source['length']) {
       return new LocalDataSource(this.source);
     }
-
     return new LocalDataSource();
   }
 
   prepareSettings(): SettingsClass {
-    return deepExtend({}, new SettingsClass().default(), this.settings);
+    return deepExtend({}, new SettingsClass(), this.settings);
   }
 
   changePage($event: any) {
@@ -144,7 +145,7 @@ export class Ng2SmartTableComponent implements OnChanges {
       data: row ? row.getData() : null,
       isSelected: row ? row.getIsSelected() : null,
       source: this.source,
-      selected: selectedRows && selectedRows.length ? selectedRows.map((r: Row) => r.getData()) : [],
+      selected: selectedRows && selectedRows.length ? selectedRows.map((r: Row) => r.getData()) : []
     });
   }
 
@@ -152,7 +153,7 @@ export class Ng2SmartTableComponent implements OnChanges {
     this.rowSelect.emit({
       data: row ? row.getData() : null,
       isSelected: row ? row.getIsSelected() : null,
-      source: this.source,
+      source: this.source
     });
   }
 

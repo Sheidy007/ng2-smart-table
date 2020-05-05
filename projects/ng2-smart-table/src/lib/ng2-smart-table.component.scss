@@ -1,4 +1,32 @@
 :host {
+  ::ng-deep {
+    *:not([type='checkbox']) {
+      box-sizing: border-box;
+    }
+
+    table {
+      width: 100%;
+    }
+
+    input:not([type='checkbox']),
+    optgroup,
+    select,
+    textarea  {
+      width: 100%;
+    }
+
+    .user-select-none{
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+  }
+}
+
+/*
+:host {
   font-size: 1rem;
 
   ::ng-deep {
@@ -53,3 +81,4 @@
     }
   }
 }
+*/

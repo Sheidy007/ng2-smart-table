@@ -5,26 +5,111 @@ export class DataSet {
 
   newRow: Row;
 
-  protected data: any[] = [];
   protected columns: Column[] = [];
   protected rows: Row[] = [];
   protected selectedRow: Row;
   protected needSelect: 'first' | 'last' | '' = 'first';
 
-  constructor(data: Array<any> = [], protected columnSettings: any) {
-    this.createColumns(columnSettings);
+  settingsForReset = {};
+
+  constructor(protected data: any[] = [], protected columnSettings: any, protected settingsName: string) {
+    const tablesSettingsJson = localStorage.getItem('tablesSettings');
+    let addedSettings = {};
+    if (tablesSettingsJson) {
+      addedSettings = JSON.parse(tablesSettingsJson);
+    }
+    this.createColumns(columnSettings, settingsName, addedSettings);
     this.setData(data);
     this.createNewRow();
   }
 
   // create
 
-  createColumns(columnsSettings: any) {
-    for (const id in columnsSettings) {
-      if (columnsSettings.hasOwnProperty(id)) {
-        this.columns.push(new Column(id, columnsSettings[id], this));
+  createColumns(columnsSettings: any, settingsName: string, addedSettings: any) {
+    const oneColumnWidth = 100 / Object.keys(columnsSettings).length;
+    let widthSum = 0;
+    Object.keys(columnsSettings).forEach((key) => {
+      if (columnsSettings[key].width) {
+        widthSum += parseInt(columnsSettings[key].width, 10);
+      } else {
+        widthSum += oneColumnWidth;
+        columnsSettings[key].width = oneColumnWidth + '%';
+      }
+    });
+
+    Object.keys(columnsSettings).forEach((key) => {
+      columnsSettings[key].width = Math.round(100 / widthSum * parseInt(columnsSettings[key].width, 10)) + '%';
+    });
+
+    this.setSettingsForReset(columnsSettings, settingsName);
+
+    if (settingsName && addedSettings) {
+      if (addedSettings[settingsName]) {
+        addedSettings[settingsName].forEach((col: Column) => {
+          Object.keys(col)
+            .forEach(key => columnsSettings[col.id][key] = col[key]);
+          this.columns.push(new Column(col.id, columnsSettings[col.id]));
+        });
+      }
+    } else {
+      for (const id in columnsSettings) {
+        if (columnsSettings.hasOwnProperty(id)) {
+          this.columns.push(new Column(id, columnsSettings[id]));
+        }
       }
     }
+  }
+
+  setSettings() {
+    if (this.settingsName) {
+      const tablesSettingsJson = localStorage.getItem('tablesSettings');
+      let tablesSettings: {} = {};
+      if (tablesSettingsJson) {
+        tablesSettings = JSON.parse(tablesSettingsJson);
+      }
+      const settingsToSave = [];
+      this.getColumns().forEach(col => {
+        const colForSave = {};
+        Object.keys(col).forEach(key => {
+          if (typeof col[key] === 'string' ||
+            typeof col[key] === 'number' ||
+            typeof col[key] === 'boolean') {
+            colForSave[key] = col[key];
+          }
+        });
+        settingsToSave.push(colForSave);
+      });
+
+      tablesSettings[this.settingsName] = settingsToSave;
+      localStorage.setItem('tablesSettings', JSON.stringify(tablesSettings));
+    }
+  }
+
+  setSettingsForReset(columnsSettings: any, settingsName: string) {
+    const settingsToSave = [];
+    for (const id in columnsSettings) {
+      if (columnsSettings.hasOwnProperty(id)) {
+        const colForSave = {};
+        const col = new Column(id, columnsSettings[id]);
+        Object.keys(col).forEach(key => {
+          if (typeof col[key] === 'string' ||
+            typeof col[key] === 'number' ||
+            typeof col[key] === 'boolean') {
+            colForSave[key] = col[key];
+          }
+        });
+        settingsToSave.push(colForSave);
+      }
+    }
+    this.settingsForReset[settingsName] = settingsToSave;
+  }
+
+  resetSettings() {
+    this.columns = [];
+    this.createColumns(this.columnSettings, this.settingsName, this.settingsForReset);
+    this.setData(this.data);
+    this.createNewRow();
+    this.setSettings();
   }
 
   setData(data: Array<any>) {
@@ -79,12 +164,6 @@ export class DataSet {
     }
   }
 
-  multipleSelectRow(row: Row): Row {
-    row.isSelected = !row.isSelected;
-    this.selectedRow = row;
-    return this.selectedRow;
-  }
-
   selectPreviousRow(): Row {
     if (this.rows.length) {
       let index = this.selectedRow ? this.selectedRow.index : 0;
@@ -110,6 +189,12 @@ export class DataSet {
   reverseSelectedFlagOnRow(row: Row): Row {
     this.deselectAllByRow(row);
     this.selectedRow = row.isSelected ? row : null;
+    return this.selectedRow;
+  }
+
+  multipleSelectRow(row: Row): Row {
+    row.isSelected = !row.isSelected;
+    this.selectedRow = row;
     return this.selectedRow;
   }
 

@@ -1,19 +1,19 @@
-import { Component, Input, Output, EventEmitter, AfterViewInit, ElementRef, OnChanges } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 
 import { Grid } from '../../../lib/grid';
-import { DataSource } from '../../../lib/data-source/data-source';
+import { LocalDataSource } from '../../../lib/data-source/local.data-source';
 
 @Component({
   selector: '[ng2-st-add-button]',
   template: `
-    <a *ngIf="isActionAdd" href="#" class="ng2-smart-action ng2-smart-action-add-add"
-        [innerHTML]="addNewButtonContent" (click)="onAdd($event)"></a>
-  `,
+		<a *ngIf="isActionAdd" href="#" class="ng2-smart-action ng2-smart-action-add-add"
+		   [innerHTML]="addNewButtonContent" (click)="onAdd($event)"></a>
+  `
 })
 export class AddButtonComponent implements AfterViewInit, OnChanges {
 
   @Input() grid: Grid;
-  @Input() source: DataSource;
+  @Input() source: LocalDataSource;
   @Output() create = new EventEmitter<any>();
 
   isActionAdd: boolean;
@@ -28,7 +28,9 @@ export class AddButtonComponent implements AfterViewInit, OnChanges {
 
   ngOnChanges() {
     this.isActionAdd = this.grid.getSetting().actions.add;
-    this.addNewButtonContent = this.grid.getSetting().add.addButtonContent;
+    if (this.isActionAdd) {
+      this.addNewButtonContent = this.grid.getSetting().add.addButtonContent;
+    }
   }
 
   onAdd(event: any) {
@@ -36,7 +38,7 @@ export class AddButtonComponent implements AfterViewInit, OnChanges {
     event.stopPropagation();
     if (this.grid.getSetting().mode === 'external') {
       this.create.emit({
-        source: this.source,
+        source: this.source
       });
     } else {
       this.grid.createFormShown = true;

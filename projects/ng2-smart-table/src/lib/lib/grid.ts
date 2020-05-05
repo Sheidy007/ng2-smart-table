@@ -1,64 +1,74 @@
 import { Subject } from 'rxjs';
-import { Observable } from 'rxjs';
 import { EventEmitter } from '@angular/core';
 import { Deferred } from './helpers';
 import { Column } from './data-set/column';
 import { Row } from './data-set/row';
 import { DataSet } from './data-set/data-set';
-import { DataSource } from './data-source/data-source';
 import { DataSourceClass, SortClass } from './data-source/data-source.class';
 import { SettingsClass } from './settings.class';
+import { PagingSourceClass } from './paging-source-class';
+import { LocalDataSource } from 'ng2-smart-table';
 
 export class Grid {
 
-  source: DataSource;
+  source: LocalDataSource;
   settings: SettingsClass;
+  pagingSource: PagingSourceClass;
   dataSet: DataSet;
+  widthMultipleSelectCheckBox = '0px';
+  widthActions = '0px';
+  doResize = false;
+  doDrgDrop = false;
 
   createFormShown = false;
   onSelectRowSource = new Subject<any>();
 
-  constructor(source: DataSource, settings: any) {
-    this.setSource(source);
+  constructor(settings: any, source: LocalDataSource) {
     this.setSettings(settings);
+    this.setSource(source);
+    this.setPagingSource(source, settings);
   }
 
   showActionColumn(position: 'left' | 'right'): boolean {
-    return position === this.settings.actions.position && this.isActionsVisible();
+    return this.isActionsVisible() && position === this.settings.actions.position;
   }
 
   isActionsVisible(): boolean {
-    return !!this.settings.actions.add || !!this.settings.actions.edit
-      || !!this.settings.actions.delete || !!this.settings.actions.custom.length;
+    return this.settings.actions && (!!this.settings.actions.add || !!this.settings.actions.edit
+      || !!this.settings.actions.delete || !!this.settings.actions.custom.length);
   }
 
   isMultiSelectVisible(): boolean {
     return this.settings.selectMode === 'multi';
   }
 
-  getNewRow(): Row {
-    return this.dataSet.newRow;
-  }
-
   setSettings(settings) {
-    this.settings = settings;
-    this.dataSet = new DataSet([], this.settings.columns);
+    this.settings = new SettingsClass(settings);
+    this.dataSet = new DataSet([], this.settings.columns, this.settings.settingsName);
     if (this.source) {
       this.source.refresh();
     }
   }
 
-  getDataSet(): DataSet {
-    return this.dataSet;
-  }
-
-  setSource(source: DataSource) {
+  setSource(source: LocalDataSource) {
     this.source = this.prepareSource(source);
     this.source.onChanged.subscribe((changes: any) => this.processDataChange(changes));
     this.source.onUpdated.subscribe((data: any) => {
       const changedRow = this.dataSet.findRowByData(data);
       changedRow.setData(data);
     });
+  }
+
+  setPagingSource(source: LocalDataSource, settings: SettingsClass) {
+    this.pagingSource = new PagingSourceClass(source, settings);
+  }
+
+  getNewRow(): Row {
+    return this.dataSet.newRow;
+  }
+
+  getDataSet(): DataSet {
+    return this.dataSet;
   }
 
   getSetting(): SettingsClass {
@@ -81,10 +91,6 @@ export class Grid {
     this.dataSet.multipleSelectRow(row);
   }
 
-  onSelectRow(): Observable<any> {
-    return this.onSelectRowSource.asObservable();
-  }
-
   edit(row: Row) {
     row.isInEditing = true;
   }
@@ -102,8 +108,7 @@ export class Grid {
           this.dataSet.createNewRow();
         });
       }
-    }).catch((err) => {
-      // doing nothing
+    }).catch(() => {
     });
 
     if (this.settings.add.confirmCreate) {
@@ -121,6 +126,7 @@ export class Grid {
 
     const deferred = new Deferred();
     deferred.promise.then((newData) => {
+
       newData = newData ? newData : row.getNewData();
       if (deferred.resolve.skipEdit) {
         row.isInEditing = false;
@@ -129,8 +135,7 @@ export class Grid {
           row.isInEditing = false;
         });
       }
-    }).catch((err) => {
-      // doing nothing
+    }).catch(() => {
     });
 
     if (this.settings.edit.confirmSave) {
@@ -149,8 +154,7 @@ export class Grid {
     const deferred = new Deferred();
     deferred.promise.then(() => {
       this.source.remove(row.getData()).then();
-    }).catch((err) => {
-      // doing nothing
+    }).catch(() => {
     });
 
     if (this.settings.delete.confirmDelete) {
@@ -172,48 +176,36 @@ export class Grid {
 
     const row = this.determineRowToSelect(changes);
     if (row) {
+      this.pagingSource.scrollToRow(row);
       this.onSelectRowSource.next(row);
     }
   }
 
   shouldProcessChange(changes: DataSourceClass): boolean {
-    if (['filter', 'sort', 'page', 'remove', 'refresh', 'load', 'paging'].includes(changes.action)) {
-      return true;
-    } else if (['prepend', 'append'].includes(changes.action) && !this.settings.pager.display) {
-      return true;
-    }
-    return false;
+    return ['filter', 'sort', 'page', 'remove', 'refresh', 'load', 'paging', 'prepend', 'append']
+      .includes(changes.action);
   }
 
-  // TODO: move to selectable? Separate directive
   determineRowToSelect(changes: DataSourceClass): Row {
+    let row = null;
     switch (changes.action) {
-      case 'load':
-      case 'page':
-      case 'filter':
-      case 'sort':
-      case 'refresh':
-        return this.dataSet.select();
       case 'add':
       case 'append':
-        return this.dataSet.selectLastRow();
+        row = this.dataSet.selectLastRow();
+        break;
+      case 'unshift':
       case 'prepend':
-        return this.dataSet.selectFirstRow();
-      case  'remove':
-        return (changes.elements.length ? this.dataSet.selectPreviousRow() : this.dataSet.selectLastRow());
+        row = this.dataSet.selectFirstRow();
+        break;
     }
-    return null;
+    return row;
   }
 
-  prepareSource(source: DataSource): DataSource {
+  prepareSource(source: LocalDataSource): LocalDataSource {
     const initialSort: SortClass = this.getInitialSort();
     if (initialSort && initialSort.field && initialSort.direction) {
-      source.setSort([initialSort], false);
+      source.sorterSource.setSort([initialSort], false);
     }
-    if (this.settings.pager.display === true) {
-      source.setPaging(1, this.settings.pager.perPage, false);
-    }
-
     source.refresh();
     return source;
   }

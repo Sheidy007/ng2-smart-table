@@ -1,31 +1,39 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
-
-import { DataSource } from '../../../../lib/data-source/data-source';
 import { Column } from '../../../../lib/data-set/column';
 import { SettingsClass } from '../../../../lib/settings.class';
+import { LocalDataSource } from '../../../../lib/data-source/local.data-source';
 
 @Component({
   selector: 'ng2-smart-table-title',
   styleUrls: ['./title.component.scss'],
   template: `
-		<a href="#" *ngIf="column.sort"
-		   (click)="doSort($event)"
-		   class="ng2-smart-sort-link sort"
-		   [ngClass]="currentDirection">
-			{{ column.title }}
-		</a>
-		<span class="ng2-smart-sort" *ngIf="!column.sort">{{ column.title }}</span>
+		<div class="ng2-smart-sort-div"
+		     [ngStyle]="{
+			     whiteSpace:'nowrap'
+			     , overflow:'hidden'
+			     , textOverflow:'ellipsis'}">
+			<span *ngIf="length && length>1 && id">({{id}})</span>
+			<a href="#" *ngIf="column.sort"
+			   (click)="doSort($event)"
+			   class="ng2-smart-sort-link sort"
+			   [ngClass]="currentDirection">
+				{{ column.title }}
+			</a>
+			<span class="ng2-smart-sort" *ngIf="!column.sort">{{ column.title }}</span>
+		</div>
   `
 })
 export class TitleComponent implements OnChanges {
 
   @Input() column: Column;
-  @Input() source: DataSource;
+  @Input() source: LocalDataSource;
   @Input() settings: SettingsClass;
   @Output() sort = new EventEmitter<any>();
 
   currentDirection: 'desc' | 'asc' | '' = '';
+  id: number;
+  length = 0;
   protected dataChangedSub: Subscription;
 
   ngOnChanges(changes: SimpleChanges) {
@@ -34,15 +42,20 @@ export class TitleComponent implements OnChanges {
         this.dataChangedSub.unsubscribe();
       }
       this.dataChangedSub = this.source.onChanged.subscribe((dataChanges) => {
-        const sortConf = this.source.getSort();
-
+        const sortConf = this.source.sorterSource.getSort().sorts;
+        this.length = sortConf.length;
         if (sortConf.length) {
           const thisSort = sortConf.find(s => s.field === this.column.id);
           if (thisSort) {
+            this.id = sortConf.findIndex(s => s.field === this.column.id) + 1;
             this.currentDirection = thisSort.direction;
+          } else {
+            this.currentDirection = this.column.defaultSortDirection;
+            this.id = null;
           }
         } else {
-          this.currentDirection = '';
+          this.currentDirection = this.column.defaultSortDirection;
+          this.id = null;
         }
       });
     }
@@ -51,21 +64,27 @@ export class TitleComponent implements OnChanges {
   doSort(event: any) {
     event.preventDefault();
     this.changeSortDirection();
-    this.source.setSort([
+    this.source.sorterSource.setSort([
       {
         field: this.column.id,
         direction: this.currentDirection,
         compare: this.column.getCompareFunction()
       }
-    ], true, this.column.multiCompare);
-    this.sort.emit(null);
+    ], true, this.settings.multiCompare);
+    this.sort.emit();
   }
 
   changeSortDirection(): string {
-    if (this.currentDirection) {
-      this.currentDirection = this.currentDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-      this.currentDirection = this.column.defaultSortDirection;
+    switch (this.currentDirection) {
+      case '':
+        this.currentDirection = 'asc';
+        break;
+      case 'asc':
+        this.currentDirection = 'desc';
+        break;
+      case 'desc':
+        this.currentDirection = this.column.defaultSortDirection;
+        break;
     }
     return this.currentDirection;
   }

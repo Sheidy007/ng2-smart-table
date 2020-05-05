@@ -1,18 +1,26 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { Ng2SmartTableModule } from 'ng2-smart-table';
 
-import { PagesModule } from './pages/pages.module';
 import { AppComponent } from './app.component';
 import { routes } from './app.routes';
 import { ScrollPositionDirective } from './theme/directives/scrollPosition.directive';
+import { AdvancedExamplesTypesComponent } from './pages/examples/custom-edit-view/advanced-example-types.component';
+import { ButtonViewComponent } from './pages/examples/custom-edit-view/basic-example-button-view.component';
+import { CustomEditorComponent } from './pages/examples/custom-edit-view/custom-editor.component';
+import { CustomFilterComponent } from './pages/examples/custom-edit-view/custom-filter.component';
+
 @NgModule({
   declarations: [
     AppComponent,
     ScrollPositionDirective,
+    AdvancedExamplesTypesComponent,
+    ButtonViewComponent,
+    CustomEditorComponent,
+    CustomFilterComponent
   ],
   imports: [
     BrowserModule,
@@ -20,9 +28,14 @@ import { ScrollPositionDirective } from './theme/directives/scrollPosition.direc
     HttpClientModule,
     RouterModule.forRoot(routes, { useHash: true }),
     Ng2SmartTableModule,
-    PagesModule,
+    ReactiveFormsModule
+  ],
+  entryComponents: [
+    ButtonViewComponent,
+    CustomEditorComponent,
+    CustomFilterComponent
   ],
   providers: [],
-  bootstrap: [AppComponent],
+  bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

@@ -1,7 +1,11 @@
+/*
 :host {
   .ng2-smart-row {
     &.selected {
       background: rgba(0, 0, 0, 0.05);
+    }
+    &.pageFinish {
+      border-bottom: rgb(100, 100, 100) 0.15rem dashed;
     }
     .ng2-smart-actions {
       &.ng2-smart-action-multiple-select {
@@ -14,4 +18,9 @@
       margin-right: 0.25rem;
     }
   }
+}
+*/
+.scroll-container {
+  position: relative;
+  height: 200px;
 }
