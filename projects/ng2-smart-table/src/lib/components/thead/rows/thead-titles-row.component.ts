@@ -204,44 +204,43 @@ export class TheadTitlesRowComponent implements OnChanges {
       }
     }
 
-    if (thisNewPercent < this.oldPercent && nextForLeft) {
-      if (sumLeft > 0) {
-        let needDiff = this.oldPercent - thisNewPercent;
-        let realDiff = 0;
+    if ((sumLeft > 0 ||  this.oldPercent > this.minColumnWidth) && thisNewPercent < this.oldPercent && nextForLeft) {
+      let needDiff = this.oldPercent - thisNewPercent;
+      let realDiff = 0;
 
-        if (thisNewPercent > this.minColumnWidth) {
-          realDiff += needDiff;
-          column.width = thisNewPercent + '%';
-          needDiff = 0;
-        } else {
-          realDiff = this.oldPercent - this.minColumnWidth;
-          needDiff = this.minColumnWidth - thisNewPercent;
-          if (column.width !== this.minColumnWidth + '%') {
-            column.width = this.minColumnWidth + '%';
-          }
+      if (thisNewPercent > this.minColumnWidth) {
+        realDiff += needDiff;
+        column.width = thisNewPercent + '%';
+        needDiff = 0;
+      } else {
+        realDiff = this.oldPercent - this.minColumnWidth;
+        needDiff = this.minColumnWidth - thisNewPercent;
+        if (column.width !== this.minColumnWidth + '%') {
+          column.width = this.minColumnWidth + '%';
         }
+      }
 
-        if (needDiff > 0) {
-          for (let i = 0; i < this.oldWidthPrev.length; i++) {
-            if (this.oldWidthPrev[i] !== this.minColumnWidth && needDiff > 0) {
-              if (this.oldWidthPrev[i] - needDiff > this.minColumnWidth) {
-                realDiff += needDiff;
-                columns[id - i - 1].width = this.oldWidthPrev[i] - needDiff + '%';
-                needDiff = 0;
-                break;
-              } else {
-                realDiff += this.oldWidthPrev[i] - this.minColumnWidth;
-                needDiff -= this.oldWidthPrev[i] - this.minColumnWidth;
+      if (needDiff > 0) {
+        for (let i = 0; i < this.oldWidthPrev.length; i++) {
+          if (this.oldWidthPrev[i] !== this.minColumnWidth && needDiff > 0) {
+            if (this.oldWidthPrev[i] - needDiff > this.minColumnWidth) {
+              realDiff += needDiff;
+              columns[id - i - 1].width = this.oldWidthPrev[i] - needDiff + '%';
+              needDiff = 0;
+              break;
+            } else {
+              realDiff += this.oldWidthPrev[i] - this.minColumnWidth;
+              needDiff -= this.oldWidthPrev[i] - this.minColumnWidth;
 
-                if (columns[id - i - 1].width !== this.minColumnWidth + '%') {
-                  columns[id - i - 1].width = this.minColumnWidth + '%';
-                }
+              if (columns[id - i - 1].width !== this.minColumnWidth + '%') {
+                columns[id - i - 1].width = this.minColumnWidth + '%';
               }
             }
           }
         }
-        columns[id + 1].width = nextForLeft + realDiff + '%';
       }
+      columns[id + 1].width = nextForLeft + realDiff + '%';
+
     }
   }
 }
