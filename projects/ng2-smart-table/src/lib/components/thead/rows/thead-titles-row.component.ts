@@ -24,7 +24,7 @@ import { Column } from 'ng2-smart-table';
 			    [grid]="grid"
 			    [ngStyle]="{width : grid.widthActions}"></th>
 			<th cdkDrag
-			    *ngFor="let column of grid.getColumns()"
+			    *ngFor="let column of grid.getColumns(); let i = index"
 			    [ngClass]="column.class"
 			    [style.width]="column.width"
 			    [style.minWidth]="'100px'"
@@ -36,7 +36,9 @@ import { Column } from 'ng2-smart-table';
 				                     [source]="source"
 				                     [column]="column"
 				                     (sort)="sort.emit($event)"></ng2-st-column-title>
-				<span [ngClass]="!grid.doDrgDrop && !grid.doResize?'resize-handle':''"
+				<span [ngClass]="
+				!grid.doDrgDrop && !grid.doResize &&i!==grid.getColumns().length-1?'resize-handle':''
+"
 				      (mousedown)="resize($event, column)"></span>
 			</th>
 			<th ng2-st-actions-title *ngIf="showActionColumnRight"
