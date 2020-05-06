@@ -1,5 +1,4 @@
-<table [style.tableLayout]="'fixed'"
-       class="ng2-smart-table-column-show">
+<table class="ng2-smart-table-column-show">
 	<thead>
 	<tr>
 		<th [style.width]="'50%'">Name</th>
@@ -14,7 +13,7 @@
 		<td cdkDrag
 		    (mousedown)="grid.doDrgDrop = true"
 		    (mouseup)="grid.doDrgDrop = false">
-			<table [style.tableLayout]="'fixed'" [style.width]="'800px'">
+			<table [style.width]="'800px'">
 				<td [ngStyle]="{width:column.width,
 				    backgroundColor:column.show?'green':'yellow',
 				    whiteSpace: 'nowrap',

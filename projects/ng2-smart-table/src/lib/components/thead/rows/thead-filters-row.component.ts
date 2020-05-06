@@ -6,26 +6,26 @@ import { LocalDataSource } from '../../../lib/data-source/local.data-source';
   selector: '[ng2-st-thead-filters-row]',
   template: `
 		<tr>
-			<th *ngIf="isMultiSelectVisible"
-			    [ngStyle]="{width : grid.widthMultipleSelectCheckBox}"></th>
-			<th ng2-st-add-button *ngIf="showActionColumnLeft"
+			<td *ngIf="isMultiSelectVisible"
+			    [ngStyle]="{width : grid.widthMultipleSelectCheckBox}"></td>
+			<td ng2-st-add-button *ngIf="showActionColumnLeft"
 			    [grid]="grid"
 			    (create)="create.emit($event)"
 			    [ngStyle]="{width : grid.widthActions}">
-			</th>
-			<th *ngFor="let column of noHideColumns" class="ng2-smart-th {{ column.id }}">
+			</td>
+			<td *ngFor="let column of noHideColumns" class="ng2-smart-th {{ column.id }}">
 				<ng2-smart-table-filter [source]="source"
 				                        [column]="column"
 				                        [inputClass]="filterInputClass"
 				                        (filter)="filter.emit($event)">
 				</ng2-smart-table-filter>
-			</th>
-			<th ng2-st-add-button *ngIf="showActionColumnRight"
+			</td>
+			<td ng2-st-add-button *ngIf="showActionColumnRight"
 			    [grid]="grid"
 			    [source]="source"
 			    (create)="create.emit($event)"
 			    [ngStyle]="{width : grid.widthActions}">
-			</th>
+			</td>
 		</tr>
   `
 })

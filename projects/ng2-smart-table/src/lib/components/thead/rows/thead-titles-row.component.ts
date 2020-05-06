@@ -13,18 +13,18 @@ import { debounceTime, first, switchMap, takeUntil } from 'rxjs/operators';
 		    cdkDropListOrientation="horizontal"
 		    class="example-list"
 		    (cdkDropListDropped)="drop($event)">
-			<th ng2-st-checkbox-select-all *ngIf="isMultiSelectVisible"
+			<td ng2-st-checkbox-select-all *ngIf="isMultiSelectVisible"
 			    [grid]="grid"
 			    [source]="source"
 			    [isAllSelected]="isAllSelected"
 			    (click)="selectAllRows.emit($event)"
 			    [ngStyle]="{width : grid.widthMultipleSelectCheckBox}">
-			</th>
-			<th ng2-st-actions-title
+			</td>
+			<td ng2-st-actions-title
 			    *ngIf="showActionColumnLeft"
 			    [grid]="grid"
-			    [ngStyle]="{width : grid.widthActions}"></th>
-			<th cdkDrag
+			    [ngStyle]="{width : grid.widthActions}"></td>
+			<td cdkDrag
 			    *ngFor="let column of noHideColumns; let i = index"
 			    [ngClass]="column.class"
 			    [style.width]="column.width"
@@ -37,14 +37,13 @@ import { debounceTime, first, switchMap, takeUntil } from 'rxjs/operators';
 				                     [source]="source"
 				                     [column]="column"
 				                     (sort)="sort.emit($event)"></ng2-st-column-title>
-				<span [ngClass]="
-				!grid.doDrgDrop && !grid.doResize &&i!==noHideColumns.length-1?'resize-handle':''
-"
-				      (mousedown)="resize($event, column)"></span>
-			</th>
-			<th ng2-st-actions-title *ngIf="showActionColumnRight"
+				<span [ngClass]="!grid.doDrgDrop && !grid.doResize && i !== noHideColumns.length-1 ? 'resize-handle' : ''"
+				      (mousedown)="resize($event, column)">
+        </span>
+			</td>
+			<td ng2-st-actions-title *ngIf="showActionColumnRight"
 			    [grid]="grid"
-			    [ngStyle]="{width : grid.widthActions}"></th>
+			    [ngStyle]="{width : grid.widthActions}"></td>
 		</tr>
   `,
   styles: [`
