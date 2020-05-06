@@ -125,7 +125,7 @@ Tables updated to Angular 8.
 * **table:** fix a bug where source changes but filter doesn't get updated ([#331](https://github.com/akveo/ng2-smart-table/issues/331)) ([c48818f](https://github.com/akveo/ng2-smart-table/commit/c48818f))
 * **table:** fix an issue where pager is vertical (fix [#343](https://github.com/akveo/ng2-smart-table/issues/343)) ([04c896e](https://github.com/akveo/ng2-smart-table/commit/04c896e))
 * **table:** fix bug when source changes and it's type is Array ([#327](https://github.com/akveo/ng2-smart-table/issues/327)) ([b72c29f](https://github.com/akveo/ng2-smart-table/commit/b72c29f))
-* **table:** hide actions when no actions ([27abbb5](https://github.com/akveo/ng2-smart-table/commit/27abbb5))
+* **table:** show actions when no actions ([27abbb5](https://github.com/akveo/ng2-smart-table/commit/27abbb5))
 * **table:** make `source` input property properly annotated as DataSource in dependent components ([#332](https://github.com/akveo/ng2-smart-table/issues/332)) ([9be34fc](https://github.com/akveo/ng2-smart-table/commit/9be34fc))
 * **table:** onComponentInit hook didn't called when OnInit didn't implemented ([067a346](https://github.com/akveo/ng2-smart-table/commit/067a346))
 * **table:** only perform filter if search string is present ([#358](https://github.com/akveo/ng2-smart-table/issues/358)) ([3886007](https://github.com/akveo/ng2-smart-table/commit/3886007))

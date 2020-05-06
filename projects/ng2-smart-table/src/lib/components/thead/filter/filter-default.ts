@@ -18,7 +18,7 @@ export class FilterDefault {
   query = '';
 
   onFilter(query: string) {
-    this.source.filterSource.addFilter({
+    this.source.addFilter({
       field: this.column.id,
       search: query,
       filter: this.column.getFilterFunction(),

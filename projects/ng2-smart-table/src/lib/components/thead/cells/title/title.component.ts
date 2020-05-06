@@ -42,7 +42,7 @@ export class TitleComponent implements OnChanges {
         this.dataChangedSub.unsubscribe();
       }
       this.dataChangedSub = this.source.onChanged.subscribe((dataChanges) => {
-        const sortConf = this.source.sorterSource.getSort().sorts;
+        const sortConf = this.source.getSort().sorts;
         this.length = sortConf.length;
         if (sortConf.length) {
           const thisSort = sortConf.find(s => s.field === this.column.id);
@@ -64,7 +64,7 @@ export class TitleComponent implements OnChanges {
   doSort(event: any) {
     event.preventDefault();
     this.changeSortDirection();
-    this.source.sorterSource.setSort([
+    this.source.setSort([
       {
         field: this.column.id,
         direction: this.currentDirection,

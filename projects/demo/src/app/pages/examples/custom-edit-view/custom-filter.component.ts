@@ -8,10 +8,10 @@ import { DefaultFilter } from 'ng2-smart-table';
   template: `
 		<input
 				#number
-				[ngClass]="inputClass"
 				[formControl]="inputControl"
-				class="form-control"
+				[ngClass]="inputClass"
 				[placeholder]="column.title"
+				class="form-control"
 				type="number">
   `
 })

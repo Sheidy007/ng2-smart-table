@@ -2,24 +2,29 @@ import { deepExtend } from '../helpers';
 import { FilterSourceClass } from './filter-source.class';
 import { SorterSourceClass } from './sorter-source.class';
 import { Subject } from 'rxjs';
-import { DataSourceClass } from './data-source.class';
+import { DataSourceClass, FilterClass, FilterConfClass, SortClass, SortConfClass } from './data-source.class';
 
 export class LocalDataSource {
 
   data = [];
   filteredAndSorted = [];
-  filterSource: FilterSourceClass;
-  sorterSource: SorterSourceClass;
+  protected filterSource: FilterSourceClass;
+  protected sorterSource: SorterSourceClass;
   onChanged = new Subject<DataSourceClass>();
   onAdded = new Subject<DataSourceClass>();
   onUpdated = new Subject<DataSourceClass>();
   onRemoved = new Subject<DataSourceClass>();
+  onGetAllGrid = new Subject<void>();
 
   constructor(data: Array<any> = []) {
     this.data = data;
     this.filteredAndSorted = this.data;
     this.filterSource = new FilterSourceClass(this);
     this.sorterSource = new SorterSourceClass(this);
+  }
+
+  emitAllGrids() {
+    this.onGetAllGrid.next();
   }
 
   refresh() {
@@ -124,8 +129,8 @@ export class LocalDataSource {
         multiSort: false
       };
     } else {
-      this.filterSource.setFilter([], true, false);
-      this.sorterSource.setSort([], false, false);
+      this.setFilter([], true, false);
+      this.setSort([], false, false);
     }
   }
 
@@ -133,6 +138,54 @@ export class LocalDataSource {
     this.data = [];
     this.emitOnChanged('empty');
     return Promise.resolve();
+  }
+
+  getFilter(): FilterConfClass {
+    return this.filterSource.getFilter();
+  }
+
+  setFilter(conf: FilterClass[], andOperator = true, doEmit = true): LocalDataSource {
+    const result = this.filterSource.setFilter(conf, andOperator);
+    if (doEmit) {
+      this.emitOnChanged('filter');
+    }
+    return result;
+  }
+
+  addFilter(fieldConf: FilterClass, andOperator = true, doEmit: boolean = true): LocalDataSource {
+    const result = this.filterSource.addFilter(fieldConf, andOperator);
+    if (doEmit) {
+      this.emitOnChanged('filter');
+    }
+    return result;
+  }
+
+  clearFilter(doEmit: boolean = true) {
+    this.setFilter([], true, doEmit);
+  }
+
+  getSort(): SortConfClass {
+    return this.sorterSource.getSort();
+  }
+
+  setSort(conf: SortClass[], doEmit = true, multiSort = false): LocalDataSource {
+    const result = this.sorterSource.setSort(conf, multiSort);
+    if (doEmit) {
+      this.emitOnChanged('sort');
+    }
+    return result;
+  }
+
+  addSort(fieldConf: SortClass, doEmit = true, multiSort = false): LocalDataSource {
+    const result = this.sorterSource.addSort(fieldConf, multiSort);
+    if (doEmit) {
+      this.emitOnChanged('sort');
+    }
+    return result;
+  }
+
+  clearSort(doEmit: boolean = true) {
+    this.setSort([], doEmit, true);
   }
 
   count(): number {
@@ -155,7 +208,7 @@ export class LocalDataSource {
     this.onAdded.next(element);
   }
 
-  emitOnChanged(action) {
+  protected emitOnChanged(action) {
     this.getFilteredAndSorted().then((elements) =>
       this.onChanged.next({
         action,

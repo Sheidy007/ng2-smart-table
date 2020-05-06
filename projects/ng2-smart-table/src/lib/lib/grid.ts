@@ -75,8 +75,12 @@ export class Grid {
     return this.settings;
   }
 
-  getColumns(): Array<Column> {
+  getColumns(): Column[] {
     return this.dataSet.getColumns();
+  }
+
+  getNoHideColumns(): Column[] {
+    return this.dataSet.getNoHidColumns();
   }
 
   getRows(): Array<Row> {
@@ -204,7 +208,7 @@ export class Grid {
   prepareSource(source: LocalDataSource): LocalDataSource {
     const initialSort: SortClass = this.getInitialSort();
     if (initialSort && initialSort.field && initialSort.direction) {
-      source.sorterSource.setSort([initialSort], false);
+      source.setSort([initialSort], false);
     }
     source.refresh();
     return source;

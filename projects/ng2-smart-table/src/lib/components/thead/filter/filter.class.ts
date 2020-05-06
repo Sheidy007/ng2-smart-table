@@ -1,8 +1,8 @@
 export class FilterOrEditConfigClass {
   selectText?: string;
   list?: { value: string, title: string }[];
-  false?: boolean;
-  true?: boolean;
+  false?: string;
+  true?: string;
   resetText?: string;
   completer?: any;
 }

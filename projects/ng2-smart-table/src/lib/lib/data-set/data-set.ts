@@ -30,16 +30,20 @@ export class DataSet {
     const oneColumnWidth = 100 / Object.keys(columnsSettings).length;
     let widthSum = 0;
     Object.keys(columnsSettings).forEach((key) => {
-      if (columnsSettings[key].width) {
-        widthSum += parseInt(columnsSettings[key].width, 10);
-      } else {
-        widthSum += oneColumnWidth;
-        columnsSettings[key].width = oneColumnWidth + '%';
+      if (!columnsSettings[key].hide) {
+        if (columnsSettings[key].width) {
+          widthSum += parseInt(columnsSettings[key].width, 10);
+        } else {
+          widthSum += oneColumnWidth;
+          columnsSettings[key].width = oneColumnWidth + '%';
+        }
       }
     });
 
     Object.keys(columnsSettings).forEach((key) => {
-      columnsSettings[key].width = Math.round(100 / widthSum * parseInt(columnsSettings[key].width, 10)) + '%';
+      if (!columnsSettings[key].hide) {
+        columnsSettings[key].width = Math.round(1000 / widthSum * parseInt(columnsSettings[key].width, 10)) + '%';
+      }
     });
 
     if (!this.settingsForReset) {
@@ -47,18 +51,16 @@ export class DataSet {
       this.setSettingsForReset(columnsSettings, settingsName);
     }
 
-    if (settingsName && addedSettings) {
-      if (addedSettings[settingsName]) {
-        addedSettings[settingsName].forEach((col: Column) => {
-          Object.keys(col)
-            .forEach(key => columnsSettings[col.id][key] = col[key]);
-          this.columns.push(new Column(col.id, columnsSettings[col.id]));
-        });
-      }
+    if (settingsName && addedSettings && addedSettings[settingsName]) {
+      addedSettings[settingsName].forEach((col: Column) => {
+        Object.keys(col)
+          .forEach(key => columnsSettings[col.id][key] = col[key]);
+        this.columns.push(new Column(columnsSettings[col.id], col.id));
+      });
     } else {
       for (const id in columnsSettings) {
         if (columnsSettings.hasOwnProperty(id)) {
-          this.columns.push(new Column(id, columnsSettings[id]));
+          this.columns.push(new Column(columnsSettings[id], id));
         }
       }
     }
@@ -96,6 +98,7 @@ export class DataSet {
         const colForSave = {};
         const col = columnsSettings[id];
         colForSave['id'] = id;
+        colForSave['show'] = col['show'] !== false;
         Object.keys(col).forEach(key => {
           if (typeof col[key] === 'string' ||
             typeof col[key] === 'number' ||
@@ -111,10 +114,15 @@ export class DataSet {
 
   resetSettings() {
     this.columns = [];
+    const tablesSettingsJson = localStorage.getItem('tablesSettings');
+    if (tablesSettingsJson) {
+      const addedSettings = JSON.parse(tablesSettingsJson);
+      delete (addedSettings[this.settingsName]);
+      localStorage.setItem('tablesSettings', JSON.stringify(addedSettings));
+    }
     this.createColumns(this.columnSettings, this.settingsName, this.settingsForReset);
     this.setData(this.data);
     this.createNewRow();
-    this.setSettings();
   }
 
   setData(data: Array<any>) {
@@ -138,6 +146,10 @@ export class DataSet {
 
   getColumns(): Column[] {
     return this.columns;
+  }
+
+  getNoHidColumns(): Column[] {
+    return this.columns.filter(c => c.show);
   }
 
   getRows(): Row[] {

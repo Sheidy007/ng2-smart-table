@@ -24,7 +24,7 @@ import { Column } from 'ng2-smart-table';
 			    [grid]="grid"
 			    [ngStyle]="{width : grid.widthActions}"></th>
 			<th cdkDrag
-			    *ngFor="let column of grid.getColumns(); let i = index"
+			    *ngFor="let column of noHideColumns; let i = index"
 			    [ngClass]="column.class"
 			    [style.width]="column.width"
 			    [style.minWidth]="'100px'"
@@ -37,7 +37,7 @@ import { Column } from 'ng2-smart-table';
 				                     [column]="column"
 				                     (sort)="sort.emit($event)"></ng2-st-column-title>
 				<span [ngClass]="
-				!grid.doDrgDrop && !grid.doResize &&i!==grid.getColumns().length-1?'resize-handle':''
+				!grid.doDrgDrop && !grid.doResize &&i!==noHideColumns.length-1?'resize-handle':''
 "
 				      (mousedown)="resize($event, column)"></span>
 			</th>
@@ -68,6 +68,14 @@ export class TheadTitlesRowComponent implements OnChanges {
   @Output() sort = new EventEmitter<any>();
   @Output() selectAllRows = new EventEmitter<any>();
 
+  get minColumnWidthFix() {
+    return this.minColumnWidth * 10;
+  }
+
+  get noHideColumns() {
+    return this.grid.getNoHideColumns();
+  }
+
   isMultiSelectVisible: boolean;
   showActionColumnLeft: boolean;
   showActionColumnRight: boolean;
@@ -86,7 +94,10 @@ export class TheadTitlesRowComponent implements OnChanges {
 
   drop(event: CdkDragDrop<string[]>) {
     this.grid.doDrgDrop = false;
-    moveItemInArray(this.grid.getColumns(), event.previousIndex, event.currentIndex);
+    const columns = this.grid.getColumns();
+    const previousIndex = columns.indexOf(this.noHideColumns[event.previousIndex]);
+    const currentIndex = columns.indexOf(this.noHideColumns[event.currentIndex]);
+    moveItemInArray(this.grid.getColumns(), previousIndex, currentIndex);
     this.grid.getRows().forEach(row => row.process());
     this.grid.getDataSet().setSettings();
   }
@@ -94,7 +105,7 @@ export class TheadTitlesRowComponent implements OnChanges {
   resize(event: Event, column: Column) {
     event.stopPropagation();
     const el = (event.target as HTMLElement).parentElement;
-    let columns = this.grid.getColumns();
+    let columns = this.noHideColumns;
     const id = columns.indexOf(column);
     this.setPreResize(event, el, columns, id);
 
@@ -103,14 +114,14 @@ export class TheadTitlesRowComponent implements OnChanges {
         this.timer.unsubscribe();
       }
       this.grid.doResize = false;
-      columns = this.grid.getColumns();
+      columns = this.noHideColumns;
       let widthSum = 0;
       columns.forEach((col) => {
         widthSum += parseInt(col.width, 10);
       });
       columns.forEach((col) => {
-        let w = Math.round(100 / widthSum * parseInt(col.width, 10));
-        w = w > this.minColumnWidth ? w : this.minColumnWidth;
+        let w = Math.round(1000 / widthSum * parseInt(col.width, 10));
+        w = w > this.minColumnWidthFix ? w : this.minColumnWidthFix;
         col.width = w + '%';
       });
       this.grid.getDataSet().setSettings();
@@ -154,16 +165,16 @@ export class TheadTitlesRowComponent implements OnChanges {
 
     const newWidth = this.oldWidth + (e.screenX - this.startPosX);
     const thisNewPercent = this.oldPercent * newWidth / this.oldWidth;
-    const columns = this.grid.getColumns();
+    const columns = this.noHideColumns;
     const id = columns.indexOf(column);
 
     let sumRight = 0;
     let exclude = true;
     this.oldWidthNext.forEach(o => {
-      if (o > this.minColumnWidth) {
+      if (o > this.minColumnWidthFix) {
         exclude = false;
       }
-      if (!exclude || o > this.minColumnWidth) {
+      if (!exclude || o > this.minColumnWidthFix) {
         sumRight += o;
       }
     });
@@ -171,10 +182,10 @@ export class TheadTitlesRowComponent implements OnChanges {
     let sumLeft = 0;
     exclude = true;
     this.oldWidthPrev.forEach(o => {
-      if (o > this.minColumnWidth) {
+      if (o > this.minColumnWidthFix) {
         exclude = false;
       }
-      if (!exclude || o > this.minColumnWidth) {
+      if (!exclude || o > this.minColumnWidthFix) {
         sumLeft += o;
       }
     });
@@ -185,17 +196,17 @@ export class TheadTitlesRowComponent implements OnChanges {
         let needDiff = thisNewPercent - this.oldPercent;
         let realDiff = 0;
         for (let i = 0; i < this.oldWidthNext.length; i++) {
-          if (this.oldWidthNext[i] !== this.minColumnWidth && needDiff > 0) {
-            if (this.oldWidthNext[i] - needDiff > this.minColumnWidth) {
+          if (this.oldWidthNext[i] !== this.minColumnWidthFix && needDiff > 0) {
+            if (this.oldWidthNext[i] - needDiff > this.minColumnWidthFix) {
               realDiff += needDiff;
               columns[id + i + 1].width = this.oldWidthNext[i] - needDiff + '%';
               needDiff = 0;
               break;
             } else {
-              realDiff += this.oldWidthNext[i] - this.minColumnWidth;
-              needDiff -= this.oldWidthNext[i] - this.minColumnWidth;
-              if (columns[id + i + 1].width !== this.minColumnWidth + '%') {
-                columns[id + i + 1].width = this.minColumnWidth + '%';
+              realDiff += this.oldWidthNext[i] - this.minColumnWidthFix;
+              needDiff -= this.oldWidthNext[i] - this.minColumnWidthFix;
+              if (columns[id + i + 1].width !== this.minColumnWidthFix + '%') {
+                columns[id + i + 1].width = this.minColumnWidthFix + '%';
               }
             }
           }
@@ -204,36 +215,36 @@ export class TheadTitlesRowComponent implements OnChanges {
       }
     }
 
-    if ((sumLeft > 0 ||  this.oldPercent > this.minColumnWidth) && thisNewPercent < this.oldPercent && nextForLeft) {
+    if ((sumLeft > 0 || this.oldPercent > this.minColumnWidthFix) && thisNewPercent < this.oldPercent && nextForLeft) {
       let needDiff = this.oldPercent - thisNewPercent;
       let realDiff = 0;
 
-      if (thisNewPercent > this.minColumnWidth) {
+      if (thisNewPercent > this.minColumnWidthFix) {
         realDiff += needDiff;
         column.width = thisNewPercent + '%';
         needDiff = 0;
       } else {
-        realDiff = this.oldPercent - this.minColumnWidth;
-        needDiff = this.minColumnWidth - thisNewPercent;
-        if (column.width !== this.minColumnWidth + '%') {
-          column.width = this.minColumnWidth + '%';
+        realDiff = this.oldPercent - this.minColumnWidthFix;
+        needDiff = this.minColumnWidthFix - thisNewPercent;
+        if (column.width !== this.minColumnWidthFix + '%') {
+          column.width = this.minColumnWidthFix + '%';
         }
       }
 
       if (needDiff > 0) {
         for (let i = 0; i < this.oldWidthPrev.length; i++) {
-          if (this.oldWidthPrev[i] !== this.minColumnWidth && needDiff > 0) {
-            if (this.oldWidthPrev[i] - needDiff > this.minColumnWidth) {
+          if (this.oldWidthPrev[i] !== this.minColumnWidthFix && needDiff > 0) {
+            if (this.oldWidthPrev[i] - needDiff > this.minColumnWidthFix) {
               realDiff += needDiff;
               columns[id - i - 1].width = this.oldWidthPrev[i] - needDiff + '%';
               needDiff = 0;
               break;
             } else {
-              realDiff += this.oldWidthPrev[i] - this.minColumnWidth;
-              needDiff -= this.oldWidthPrev[i] - this.minColumnWidth;
+              realDiff += this.oldWidthPrev[i] - this.minColumnWidthFix;
+              needDiff -= this.oldWidthPrev[i] - this.minColumnWidthFix;
 
-              if (columns[id - i - 1].width !== this.minColumnWidth + '%') {
-                columns[id - i - 1].width = this.minColumnWidth + '%';
+              if (columns[id - i - 1].width !== this.minColumnWidthFix + '%') {
+                columns[id - i - 1].width = this.minColumnWidthFix + '%';
               }
             }
           }

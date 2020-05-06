@@ -1,26 +1,35 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component } from '@angular/core';
 import { CustomActionResultClass, SettingsClass } from '../../../../../../ng2-smart-table/src/lib/lib/settings.class';
 import { ButtonViewComponent } from './basic-example-button-view.component';
 import { CustomEditorComponent } from './custom-editor.component';
 import { CustomRenderComponent } from './custom-render.component';
+import { CustomFilterComponent } from './custom-filter.component';
+import { Grid, LocalDataSource } from 'ng2-smart-table';
 
 @Component({
   selector: 'advanced-example-types',
   template: `
+    
 		<ng2-smart-table
-				*ngIf="data.length"
+				*ngIf="data"
 				[settings]="settings"
 				[source]="data"
 				(custom)="onCustom($event)"
 				(deleteConfirm)="onDeleteConfirm($event)"
 				(editConfirm)="onSaveConfirm($event)"
-				(createConfirm)="onCreateConfirm($event)">
+				(createConfirm)="onCreateConfirm($event)"
+				(gridEmitResult)="onGridEmitResult($event)">
 		</ng2-smart-table>
+    
+		<ng2-smart-table-column-show
+				*ngIf="grid"
+				[grid]="grid">
+		</ng2-smart-table-column-show>
   `
 })
-export class AdvancedExamplesTypesComponent {
+export class AdvancedExamplesTypesComponent implements AfterViewInit {
 
-  data = [];
+  data: LocalDataSource;
 
   preData = [
     {
@@ -78,13 +87,15 @@ export class AdvancedExamplesTypesComponent {
     }
   ];
   settings: SettingsClass;
-
+  grid: Grid;
   constructor() {
+    let dt = [];
     for (let i = 0; i < 10; i++) {
       const prePreData = JSON.parse(JSON.stringify(this.preData));
       prePreData.forEach(d => d.id += i * 5);
-      this.data = [...this.data, ...prePreData];
+      dt = [...dt, ...prePreData];
     }
+    this.data = new LocalDataSource(dt);
     this.settings = {
       settingsName: 'testName',
       selectMode: 'multi',
@@ -110,7 +121,11 @@ export class AdvancedExamplesTypesComponent {
       },
       columns: {
         id: {
-          title: 'ID'
+          title: 'ID',
+          filter: {
+            type: 'custom',
+            component: CustomFilterComponent
+          }
         },
         name: {
           title: 'Full Name',
@@ -118,7 +133,7 @@ export class AdvancedExamplesTypesComponent {
             type: 'completer',
             config: {
               completer: {
-                data: this.data,
+                data: dt,
                 searchFields: 'name',
                 titleField: 'name'
               }
@@ -128,7 +143,7 @@ export class AdvancedExamplesTypesComponent {
             type: 'completer',
             config: {
               completer: {
-                data: this.data,
+                data: dt,
                 searchFields: 'name',
                 titleField: 'name'
               }
@@ -163,6 +178,7 @@ export class AdvancedExamplesTypesComponent {
         email: {
           title: 'Email',
           type: 'string',
+          show: false,
           renderComponent: CustomRenderComponent
         },
         comments: {
@@ -194,7 +210,7 @@ export class AdvancedExamplesTypesComponent {
           title: 'Button',
           type: 'custom',
           renderComponent: ButtonViewComponent,
-          onComponentInitFunction(instance) {
+          onComponentInitFunction: (instance) => {
             instance.save.subscribe(row => {
               alert(`${ row.name } saved!`);
             });
@@ -212,6 +228,12 @@ export class AdvancedExamplesTypesComponent {
     };
   }
 
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.data.emitAllGrids();
+    }, 1);
+  }
+
   onCustom(event: CustomActionResultClass) {
     alert(`Custom event '${ event.action }' fired on email : ${ event.data.email }`);
   }
@@ -226,7 +248,7 @@ export class AdvancedExamplesTypesComponent {
 
   onSaveConfirm(event) {
     if (window.confirm('Are you sure you want to save?')) {
-      event.newData['name'] += ' + added in code';
+      event.newData.name += ' + added in code';
       event.confirm.resolve(event.newData);
     } else {
       event.confirm.reject();
@@ -235,10 +257,14 @@ export class AdvancedExamplesTypesComponent {
 
   onCreateConfirm(event) {
     if (window.confirm('Are you sure you want to create?')) {
-      event.newData['name'] += ' + added in code';
+      event.newData.name += ' + added in code';
       event.confirm.resolve(event.newData);
     } else {
       event.confirm.reject();
     }
   }
-};
+
+  onGridEmitResult(event) {
+    this.grid = event;
+  }
+}

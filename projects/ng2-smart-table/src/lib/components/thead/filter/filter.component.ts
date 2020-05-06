@@ -34,7 +34,7 @@ export class FilterComponent extends FilterDefault implements OnChanges {
         this.dataChangedSub.unsubscribe();
       }
       this.dataChangedSub = this.source.onChanged.subscribe(() => {
-        const filterConf = this.source.filterSource.getFilter();
+        const filterConf = this.source.getFilter();
         if (!filterConf || !filterConf.filters || !filterConf.filters.length) {
           this.query = '';
         } else {

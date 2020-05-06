@@ -13,7 +13,7 @@ export class SorterSourceClass {
 
   }
 
-  getSort(): any {
+  getSort(): SortConfClass {
     return this.sortConf;
   }
 
@@ -28,10 +28,10 @@ export class SorterSourceClass {
    * @param multiSort contain multiSort
    * @returns LocalDataSource1 contain LocalDataSource
    */
-  setSort(conf: SortClass[], doEmit = true, multiSort = false): LocalDataSource {
+  setSort(conf: SortClass[], multiSort = false): LocalDataSource {
     if (conf && conf.length) {
       conf.forEach((fieldConf) => {
-        this.addSort(fieldConf, false, multiSort);
+        this.addSort(fieldConf, multiSort);
       });
     } else {
       this.sortConf = {
@@ -40,13 +40,10 @@ export class SorterSourceClass {
       };
     }
     this.sortConf.multiSort = multiSort;
-    if (doEmit) {
-      this.source.emitOnChanged('sort');
-    }
     return this.source;
   }
 
-  addSort(fieldConf: SortClass, doEmit = true, multiSort = false): LocalDataSource {
+  addSort(fieldConf: SortClass, multiSort = false): LocalDataSource {
     if (!fieldConf.field) {
       throw new Error('Sort configuration object is not valid');
     }
@@ -67,9 +64,6 @@ export class SorterSourceClass {
     }
 
     this.sortConf.multiSort = multiSort;
-    if (doEmit) {
-      this.source.emitOnChanged('sort');
-    }
     return this.source;
   }
 

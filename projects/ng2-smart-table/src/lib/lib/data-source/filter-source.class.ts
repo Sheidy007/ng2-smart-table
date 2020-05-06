@@ -12,7 +12,7 @@ export class FilterSourceClass {
   constructor(public source: LocalDataSource) {
 
   }
-  getFilter(): any {
+  getFilter(): FilterConfClass {
     return this.filterConf;
   }
 
@@ -27,10 +27,10 @@ export class FilterSourceClass {
    * @param doEmit contain doEmit
    * @returns LocalDataSource contain LocalDataSource
    */
-  setFilter(conf: FilterClass[], andOperator = true, doEmit = true): LocalDataSource {
+  setFilter(conf: FilterClass[], andOperator = true): LocalDataSource {
     if (conf && conf.length) {
       conf.forEach((fieldConf) => {
-        this.addFilter(fieldConf, andOperator, false);
+        this.addFilter(fieldConf, andOperator);
       });
     } else {
       this.filterConf = {
@@ -39,13 +39,10 @@ export class FilterSourceClass {
       };
     }
     this.filterConf.andOperator = andOperator;
-    if (doEmit) {
-      this.source.emitOnChanged('filter');
-    }
     return this.source;
   }
 
-  addFilter(fieldConf: FilterClass, andOperator = true, doEmit: boolean = true): LocalDataSource {
+  addFilter(fieldConf: FilterClass, andOperator = true): LocalDataSource {
     if (!fieldConf.field) {
       throw new Error('Filter configuration object is not valid');
     }
@@ -61,9 +58,6 @@ export class FilterSourceClass {
       this.filterConf.filters.push(fieldConf);
     }
     this.filterConf.andOperator = andOperator;
-    if (doEmit) {
-      this.source.emitOnChanged('filter');
-    }
     return this.source;
   }
 

@@ -1,68 +1,66 @@
-import { DataSet } from './data-set';
-import { ViewCell } from 'ng2-smart-table';
 import { FilterOrEditConfigClass } from '../../components/thead/filter/filter.class';
 
 export class Column {
 
-  title = 'undefined';
-  type: 'html' | 'custom' | 'text' = 'text';
-  class = '';
-  width = '';
-  sort = true;
-  defaultSortDirection: 'desc' | 'asc' | '' = '';
-  editable = true;
-  addable = true;
-  editor: {
-    type: 'custom' | 'completer' | 'checkbox' | 'list' | 'textarea' | 'default', config: FilterOrEditConfigClass, component: any
+  title ? = 'undefined';
+  defaultValue ? = '';
+  type?: 'html' | 'custom' | 'text' | 'string' = 'text';
+  class ? = '';
+  width ? = '';
+  sort ? = true;
+  defaultSortDirection?: 'desc' | 'asc' | '' = '';
+  editable ? = true;
+  addable ? = true;
+  show ? = true;
+
+  editor?: {
+    type: 'custom' | 'completer' | 'checkbox' | 'list' | 'textarea' | 'default',
+    config?: FilterOrEditConfigClass,
+    component?: any
+  } = { type: 'default', config: new FilterOrEditConfigClass(), component: null };
+
+  filter?: {
+    type?: 'custom' | 'completer' | 'checkbox' | 'list' | 'textarea' | 'default',
+    config?: FilterOrEditConfigClass,
+    component?: any
+  } = { type: 'default', config: new FilterOrEditConfigClass(), component: null };
+
+  renderComponent?: any = null;
+
+  compareFunction?: (...attr) => number = null;
+  valuePrepareFunction?: (...attr) => any = null;
+  filterFunction?: (...attr) => boolean = null;
+  onComponentInitFunction?: (...attr) => void = null;
+
+  constructor(columnSettings: Column, public id?: string) {
+    Object.keys(columnSettings).forEach(key => this[key] = columnSettings[key]);
   }
-    = { type: 'default', config: {}, component: null };
 
-  filter: {
-    type: 'custom' | 'completer' | 'checkbox' | 'list' | 'textarea' | 'default', config: FilterOrEditConfigClass, component: any
-  }
-    = { type: 'default', config: new FilterOrEditConfigClass(), component: null };
-
-  renderComponent: any = null;
-
-  compareFunction: () => number = null;
-  valuePrepareFunction: () => any = null;
-  filterFunction: () => boolean = null;
-
-  onComponentInitFunction: () => ViewCell = null;
-  defaultValue = '';
-  constructor(public id: string, columnSettings: Column) {
-    this.process(columnSettings);
-  }
-
-  getOnComponentInitFunction(): (...attr) => ViewCell {
+  getOnComponentInitFunction ? = (...attr) => {
     return this.onComponentInitFunction;
   }
 
-  getCompareFunction(): () => number {
+  getCompareFunction ? = () => {
     return this.compareFunction;
   }
 
-  getValuePrepareFunction(): () => any {
+  getValuePrepareFunction ? = () => {
     return this.valuePrepareFunction;
   }
 
-  getFilterFunction(): () => boolean {
+  getFilterFunction ? = () => {
     return this.filterFunction;
   }
 
-  getConfig(): FilterOrEditConfigClass {
+  getConfig ? = () => {
     return this.editor && this.editor.config;
   }
 
-  getFilterType(): 'custom' | 'completer' | 'checkbox' | 'list' | 'textarea' | 'default' {
+  getFilterType  ? = () => {
     return this.filter ? this.filter.type : 'default';
   }
 
-  getFilterConfig(): FilterOrEditConfigClass {
+  getFilterConfig ? = () => {
     return this.filter ? this.filter.config : new FilterOrEditConfigClass();
-  }
-
-  protected process(columnSettings: Column) {
-    Object.keys(columnSettings).forEach(key => this[key] = columnSettings[key]);
   }
 }

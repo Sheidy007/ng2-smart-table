@@ -13,7 +13,7 @@ import { LocalDataSource } from '../../../lib/data-source/local.data-source';
 			    (create)="create.emit($event)"
 			    [ngStyle]="{width : grid.widthActions}">
 			</th>
-			<th *ngFor="let column of grid.getColumns()" class="ng2-smart-th {{ column.id }}">
+			<th *ngFor="let column of noHideColumns" class="ng2-smart-th {{ column.id }}">
 				<ng2-smart-table-filter [source]="source"
 				                        [column]="column"
 				                        [inputClass]="filterInputClass"
@@ -41,6 +41,10 @@ export class TheadFiltersRowComponent implements OnChanges {
   showActionColumnLeft: boolean;
   showActionColumnRight: boolean;
   filterInputClass: string;
+
+  get noHideColumns() {
+    return this.grid.getNoHideColumns();
+  }
 
   ngOnChanges() {
     this.isMultiSelectVisible = this.grid.isMultiSelectVisible();

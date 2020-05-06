@@ -1,4 +1,5 @@
 import { LocalDataSource } from './data-source/local.data-source';
+import { Column } from './data-set/column';
 
 export class SettingsClass {
   settingsName ? = '';
@@ -14,7 +15,7 @@ export class SettingsClass {
   delete?: DeleteClass;
   attr?: AttributeClass = new AttributeClass();
   noDataMessage ? = 'No data found';
-  columns = {};
+  columns: { [name: string]: Column } = {};
   pager?: PagerClass = new PagerClass();
   rowClassFunction?: (...arg) => string = (...arg) => '';
 
@@ -54,11 +55,11 @@ export class SettingsClass {
         }
       }
     } else {
-      Object.keys(this.default).forEach(key => this[key] = this.default[key]);
+      this.setDefault();
     }
   }
 
-  private default ? = () => {
+  private setDefault ? = () => {
     this.mode = 'inline';
     this.selectMode = 'single';
     this.hideHeader = false;
@@ -73,7 +74,7 @@ export class SettingsClass {
     this.columns = {};
     this.pager = new PagerClass();
     this.rowClassFunction = (...arg) => '';
-  };
+  }
 }
 
 export class ActionsClass {

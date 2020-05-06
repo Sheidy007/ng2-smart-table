@@ -1,0 +1,34 @@
+<table [style.tableLayout]="'fixed'"
+       class="ng2-smart-table-column-show">
+	<thead>
+	<tr>
+		<th [style.width]="'50%'">Name</th>
+		<th [style.width]="'50%'">IsShow</th>
+	</tr>
+	</thead>
+	<tbody (cdkDropListDropped)="drop($event)"
+	       cdkDropList
+	       cdkDropListOrientation="vertical"
+	       class="example-list">
+	<tr *ngFor="let column of grid.getColumns()">
+		<td cdkDrag
+		    (mousedown)="grid.doDrgDrop = true"
+		    (mouseup)="grid.doDrgDrop = false">
+			<table [style.tableLayout]="'fixed'" [style.width]="'800px'">
+				<td [ngStyle]="{width:column.width,
+				    backgroundColor:column.show?'green':'yellow',
+				    whiteSpace: 'nowrap',
+				    overflow: 'hidden',
+				    textOverflow: 'ellipsis'}"
+				>{{column.title}}</td>
+				<td [style.width]="getAnotherWidth(column.width)"></td>
+			</table>
+		</td>
+		<td>
+			<input [(ngModel)]="column.show"
+			       (change)="resetTable()"
+			       type="checkbox">
+		</td>
+	</tr>
+	</tbody>
+</table>

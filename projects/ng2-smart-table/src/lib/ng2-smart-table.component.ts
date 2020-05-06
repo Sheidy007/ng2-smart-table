@@ -15,7 +15,7 @@ export class Ng2SmartTableComponent implements OnChanges {
   @Input() source: LocalDataSource | any;
   @Input() settings: SettingsClass;
   @Input() minTableHeight = '300px';
-  @Input() rowHeight = 25;
+  @Input() rowHeight = 20;
   @Input() minColumnWidth = 5;
 
   @Output() rowSelect = new EventEmitter<any>();
@@ -28,6 +28,7 @@ export class Ng2SmartTableComponent implements OnChanges {
   @Output() editConfirm = new EventEmitter<any>();
   @Output() createConfirm = new EventEmitter<any>();
   @Output() rowHover: EventEmitter<any> = new EventEmitter<any>();
+  @Output() gridEmitResult = new EventEmitter<Grid>();
 
   tableClass: string;
   tableId: string;
@@ -109,6 +110,9 @@ export class Ng2SmartTableComponent implements OnChanges {
     this.settings = this.prepareSettings();
     this.grid = new Grid(this.settings, this.source);
     this.grid.onSelectRowSource.subscribe((row) => this.emitSelectRow(row));
+    this.source.onGetAllGrid.subscribe(() => {
+      this.gridEmitResult.next(this.grid);
+    });
   }
 
   prepareSource(): LocalDataSource {

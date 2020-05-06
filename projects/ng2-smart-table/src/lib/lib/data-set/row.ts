@@ -42,7 +42,7 @@ export class Row {
 
   process() {
     this.cells = [];
-    this.dataSet.getColumns().forEach((column: Column) => {
+    this.dataSet.getNoHidColumns().forEach((column: Column) => {
       const cell = this.createCell(column);
       this.cells.push(cell);
     });

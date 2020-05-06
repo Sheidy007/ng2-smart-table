@@ -12,6 +12,7 @@ import { AdvancedExamplesTypesComponent } from './pages/examples/custom-edit-vie
 import { ButtonViewComponent } from './pages/examples/custom-edit-view/basic-example-button-view.component';
 import { CustomEditorComponent } from './pages/examples/custom-edit-view/custom-editor.component';
 import { CustomFilterComponent } from './pages/examples/custom-edit-view/custom-filter.component';
+import { ColumnShowModule } from '../../../ng2-smart-table/src/lib/components/columns-show/column-show.module';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { CustomFilterComponent } from './pages/examples/custom-edit-view/custom-
     HttpClientModule,
     RouterModule.forRoot(routes, { useHash: true }),
     Ng2SmartTableModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    ColumnShowModule
   ],
   entryComponents: [
     ButtonViewComponent,

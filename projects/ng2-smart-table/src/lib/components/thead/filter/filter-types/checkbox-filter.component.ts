@@ -7,17 +7,16 @@ import { debounceTime } from 'rxjs/operators';
   selector: 'checkbox-filter',
   template: `
 		<input type="checkbox"
+		       [indeterminate]="prevData === null"
 		       [formControl]="inputControl"
 		       [ngClass]="inputClass"
 		       class="form-control">
-		<a href="#" *ngIf="filterActive"
-		   (click)="resetFilter($event)">{{column.getFilterConfig()?.resetText || 'reset'}}</a>
   `
 })
 export class CheckboxFilterComponent extends DefaultFilter implements OnInit {
 
-  filterActive = false;
   inputControl = new FormControl();
+  prevData: boolean = null;
 
   constructor() {
     super();
@@ -25,21 +24,27 @@ export class CheckboxFilterComponent extends DefaultFilter implements OnInit {
 
   ngOnInit() {
     this.changesSubscription = this.inputControl.valueChanges
-      .pipe(debounceTime(this.delay))
       .subscribe((checked: boolean) => {
-        this.filterActive = true;
-        const trueVal = (this.column.getFilterConfig() && this.column.getFilterConfig().true) || true;
-        const falseVal = (this.column.getFilterConfig() && this.column.getFilterConfig().false) || false;
-        this.query = checked ? trueVal : falseVal;
-        this.setFilter();
+        if (this.prevData === null) {
+          this.prevData = true;
+        } else if (this.prevData) {
+          this.prevData = false;
+        } else {
+          this.prevData = null;
+          this.resetFilter();
+        }
+        if (this.prevData !== null) {
+          const trueVal = (this.column.getFilterConfig() && this.column.getFilterConfig().true) || true;
+          const falseVal = (this.column.getFilterConfig() && this.column.getFilterConfig().false) || false;
+          this.query = checked ? trueVal : falseVal;
+          this.setFilter();
+        }
       });
   }
 
-  resetFilter(event: any) {
-    event.preventDefault();
+  resetFilter() {
     this.query = '';
     this.inputControl.setValue(false, { emitEvent: false });
-    this.filterActive = false;
     this.setFilter();
   }
 }

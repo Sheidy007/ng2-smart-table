@@ -70,6 +70,8 @@ import { LocalDataSource } from '../../lib/data-source/local.data-source';
 			</select>
 		</nav>
 		<button (click)="reSetSettings()">reset settings</button>
+		<button (click)="reSetFilters()">reset filters</button>
+		<button (click)="reSetSorts()">reset sorts</button>
   `
 })
 export class PagerComponent implements OnInit {
@@ -182,5 +184,11 @@ export class PagerComponent implements OnInit {
 
   reSetSettings() {
     this.grid.getDataSet().resetSettings();
+  }
+  reSetFilters() {
+    this.grid.source.clearFilter();
+  }
+  reSetSorts() {
+    this.grid.source.clearSort();
   }
 }

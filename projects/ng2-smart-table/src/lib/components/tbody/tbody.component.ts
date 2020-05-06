@@ -49,9 +49,14 @@ export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit {
   @ViewChildren('actionsLeft') actionsLeft: QueryList<ElementRef>;
   @ViewChildren('actionsRight') actionsRight: QueryList<ElementRef>;
   @ViewChildren('actionsUpdate') actionsUpdate: QueryList<ElementRef>;
+
+  get noHideColumns() {
+    return this.grid.getNoHideColumns();
+  }
+
   get tableColumnsCount() {
     const actionColumns = this.isActionAdd || this.isActionEdit || this.isActionDelete ? 1 : 0;
-    return this.grid.getColumns().length + actionColumns;
+    return this.noHideColumns.length + actionColumns;
   }
 
   ngAfterViewInit() {
