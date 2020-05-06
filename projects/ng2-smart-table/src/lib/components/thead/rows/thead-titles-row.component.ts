@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
-import { fromEvent, Subscription, timer } from 'rxjs';
+import { fromEvent, of, Subject } from 'rxjs';
 import { Grid } from '../../../lib/grid';
 import { LocalDataSource } from '../../../lib/data-source/local.data-source';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Column } from 'ng2-smart-table';
+import { debounceTime, first, switchMap, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: '[ng2-st-thead-titles-row]',
@@ -47,16 +48,16 @@ import { Column } from 'ng2-smart-table';
 		</tr>
   `,
   styles: [`
-               .resize-handle {
-                   position: absolute;
-                   top: 0;
-                   right: 0;
-                   bottom: 0;
-                   width: 2px;
-                   z-index: 2;
-                   cursor: col-resize;
-                   background-color: black;
-               }`]
+             .resize-handle {
+               position: absolute;
+               top: 0;
+               right: 0;
+               bottom: 0;
+               width: 2px;
+               z-index: 2;
+               cursor: col-resize;
+               background-color: black;
+             }`]
 })
 export class TheadTitlesRowComponent implements OnChanges {
 
@@ -84,7 +85,7 @@ export class TheadTitlesRowComponent implements OnChanges {
   oldWidthNext = [];
   oldWidthPrev = [];
   startPosX = 0;
-  timer: Subscription;
+  destroy = new Subject<void>();
 
   ngOnChanges() {
     this.isMultiSelectVisible = this.grid.isMultiSelectVisible();
@@ -109,34 +110,39 @@ export class TheadTitlesRowComponent implements OnChanges {
     const id = columns.indexOf(column);
     this.setPreResize(event, el, columns, id);
 
-    const evUp = fromEvent(window, 'mouseup').subscribe((e: MouseEvent) => {
-      if (this.timer) {
-        this.timer.unsubscribe();
-      }
-      this.grid.doResize = false;
-      columns = this.noHideColumns;
-      let widthSum = 0;
-      columns.forEach((col) => {
-        widthSum += parseInt(col.width, 10);
-      });
-      columns.forEach((col) => {
-        let w = Math.round(1000 / widthSum * parseInt(col.width, 10));
-        w = w > this.minColumnWidthFix ? w : this.minColumnWidthFix;
-        col.width = w + '%';
-      });
-      this.grid.getDataSet().setSettings();
-      evUp.unsubscribe();
-      evMove.unsubscribe();
-    });
+    const destroyMove = new Subject<void>();
 
-    const evMove = fromEvent(window, 'mousemove').subscribe((e: MouseEvent) => {
-      if (this.timer) {
-        this.timer.unsubscribe();
-      }
-      this.timer = timer(15).subscribe(() => {
+    fromEvent(window, 'mouseup')
+      .pipe(first(), takeUntil(this.destroy))
+      .subscribe(() => {
+        destroyMove.next();
+        this.grid.doResize = false;
+        columns = this.noHideColumns;
+        let widthSum = 0;
+        columns.forEach((col) => {
+          widthSum += parseInt(col.width, 10);
+        });
+        columns.forEach((col) => {
+          let w = Math.round(1000 / widthSum * parseInt(col.width, 10));
+          w = w > this.minColumnWidthFix ? w : this.minColumnWidthFix;
+          col.width = w + '%';
+        });
+        this.grid.getDataSet().setSettings();
+      });
+
+    fromEvent(window, 'mousemove')
+      .pipe(switchMap((e: MouseEvent) => {
+          if (!this.grid.doResize) {
+            this.grid.doResize = true;
+          }
+          return of(e);
+        }),
+        debounceTime(15),
+        takeUntil(destroyMove),
+        takeUntil(this.destroy))
+      .subscribe((e: MouseEvent) => {
         this.makeResize(e, column);
       });
-    });
   }
 
   setPreResize(e, el, columns, id) {
@@ -160,7 +166,6 @@ export class TheadTitlesRowComponent implements OnChanges {
   makeResize(e: MouseEvent, column: Column) {
     if (!this.grid.doResize) {
       this.startPosX = e.screenX;
-      this.grid.doResize = true;
     }
 
     const newWidth = this.oldWidth + (e.screenX - this.startPosX);
