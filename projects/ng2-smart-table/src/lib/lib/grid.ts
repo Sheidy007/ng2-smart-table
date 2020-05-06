@@ -8,6 +8,7 @@ import { DataSourceClass, SortClass } from './data-source/data-source.class';
 import { SettingsClass } from './settings.class';
 import { PagingSourceClass } from './paging-source-class';
 import { LocalDataSource } from 'ng2-smart-table';
+import { takeUntil } from 'rxjs/operators';
 
 export class Grid {
 
@@ -22,6 +23,7 @@ export class Grid {
 
   createFormShown = false;
   onSelectRowSource = new Subject<any>();
+  private destroy = new Subject<void>();
 
   constructor(settings: any, source: LocalDataSource) {
     this.setSettings(settings);
@@ -52,8 +54,8 @@ export class Grid {
 
   setSource(source: LocalDataSource) {
     this.source = this.prepareSource(source);
-    this.source.onChanged.subscribe((changes: any) => this.processDataChange(changes));
-    this.source.onUpdated.subscribe((data: any) => {
+    this.source.onChanged.pipe(takeUntil(this.destroy)).subscribe((changes: any) => this.processDataChange(changes));
+    this.source.onUpdated.pipe(takeUntil(this.destroy)).subscribe((data: any) => {
       const changedRow = this.dataSet.findRowByData(data);
       changedRow.setData(data);
     });

@@ -3,6 +3,8 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } fro
 import { PagingClass } from '../../lib/data-source/data-source.class';
 import { Grid } from '../../lib/grid';
 import { LocalDataSource } from '../../lib/data-source/local.data-source';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'ng2-smart-table-pager',
@@ -15,8 +17,7 @@ import { LocalDataSource } from '../../lib/data-source/local.data-source';
 				    class="ng2-smart-page-item page-item">
 					<button (click)="paginate(1)"
 					        aria-label="First"
-					        class="ng2-smart-page-link page-link"
-					>
+					        class="ng2-smart-page-link page-link">
 						&laquo;
 					</button>
 				</li>
@@ -89,17 +90,17 @@ export class PagerComponent implements OnInit {
     return this.perPageSettings as number[];
   }
 
-  constructor(private ref: ChangeDetectorRef) {
+  private destroy = new Subject<void>();
 
-  }
+  constructor(private ref: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.pageConf = this.grid.pagingSource.getPaging();
 
-    this.grid.pagingSource.onChanged.subscribe(() => {
+    this.grid.pagingSource.onChanged.pipe(takeUntil(this.destroy)).subscribe(() => {
       this.initPages();
     });
-    this.source.onChanged.subscribe((dataChanges) => {
+    this.source.onChanged.pipe(takeUntil(this.destroy)).subscribe((dataChanges) => {
       this.count = this.source.count();
       if (this.isPageOutOfBounce()) {
         this.grid.pagingSource.setPageByUser(--this.pageConf.page);
@@ -113,7 +114,7 @@ export class PagerComponent implements OnInit {
   }
 
   shouldShow(): boolean {
-    if (!this.pageConf || !this.perPageSettings) {return false; }
+    if (!this.pageConf || !this.perPageSettings) { return false; }
     return this.source.countAll() > this.pageConf.perPage;
   }
 

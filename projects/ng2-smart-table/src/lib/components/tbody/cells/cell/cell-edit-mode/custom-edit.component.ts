@@ -9,6 +9,8 @@ import {
 } from '@angular/core';
 
 import { EditCellDefault } from './edit-cell-default';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'table-cell-custom-editor',
@@ -20,6 +22,7 @@ export class CustomEditComponent extends EditCellDefault implements OnChanges, O
 
   customComponent: any;
   @ViewChild('dynamicTarget', { read: ViewContainerRef, static: true }) dynamicTarget: any;
+  private destroy = new Subject<void>();
 
   constructor(private resolver: ComponentFactoryResolver) {
     super();
@@ -33,9 +36,9 @@ export class CustomEditComponent extends EditCellDefault implements OnChanges, O
       // set @Inputs and @Outputs of custom component
       this.customComponent.instance.cell = this.cell;
       this.customComponent.instance.inputClass = this.inputClass;
-      this.customComponent.instance.onStopEditing.subscribe(() => this.onStopEditing());
-      this.customComponent.instance.onEdited.subscribe((event: any) => this.onEdited(event));
-      this.customComponent.instance.onClick.subscribe((event: any) => this.onClick(event));
+      this.customComponent.instance.onStopEditing.pipe(takeUntil(this.destroy)).subscribe(() => this.onStopEditing());
+      this.customComponent.instance.onEdited.pipe(takeUntil(this.destroy)).subscribe((event: any) => this.onEdited(event));
+      this.customComponent.instance.onClick.pipe(takeUntil(this.destroy)).subscribe((event: any) => this.onClick(event));
     }
   }
 
@@ -43,5 +46,7 @@ export class CustomEditComponent extends EditCellDefault implements OnChanges, O
     if (this.customComponent) {
       this.customComponent.destroy();
     }
+    this.destroy.next();
+    this.destroy.complete();
   }
 }

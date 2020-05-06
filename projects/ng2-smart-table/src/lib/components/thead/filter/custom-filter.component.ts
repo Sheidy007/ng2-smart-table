@@ -1,6 +1,7 @@
 import {
   Component,
-  ComponentFactoryResolver, Input,
+  ComponentFactoryResolver,
+  Input,
   OnChanges,
   OnDestroy,
   SimpleChanges,
@@ -9,15 +10,19 @@ import {
 } from '@angular/core';
 
 import { FilterDefault } from './filter-default';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'custom-table-filter',
-  template: `<ng-template #dynamicTarget></ng-template>`,
+  template: `
+		<ng-template #dynamicTarget></ng-template>`
 })
 export class CustomFilterComponent extends FilterDefault implements OnChanges, OnDestroy {
   @Input() query: string;
   customComponent: any;
   @ViewChild('dynamicTarget', { read: ViewContainerRef, static: true }) dynamicTarget: any;
+  private destroy = new Subject<void>();
 
   constructor(private resolver: ComponentFactoryResolver) {
     super();
@@ -31,7 +36,7 @@ export class CustomFilterComponent extends FilterDefault implements OnChanges, O
       this.customComponent.instance.column = this.column;
       this.customComponent.instance.source = this.source;
       this.customComponent.instance.inputClass = this.inputClass;
-      this.customComponent.instance.filter.subscribe((event: any) => this.onFilter(event));
+      this.customComponent.instance.filter.pipe(takeUntil(this.destroy)).subscribe((event: any) => this.onFilter(event));
     }
     if (this.customComponent) {
       this.customComponent.instance.ngOnChanges(changes);
@@ -39,6 +44,8 @@ export class CustomFilterComponent extends FilterDefault implements OnChanges, O
   }
 
   ngOnDestroy() {
+    this.destroy.next();
+    this.destroy.complete();
     if (this.customComponent) {
       this.customComponent.destroy();
     }

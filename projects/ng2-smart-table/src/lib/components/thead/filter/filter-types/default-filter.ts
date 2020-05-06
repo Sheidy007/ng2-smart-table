@@ -1,5 +1,5 @@
 import { Input, Output, EventEmitter, OnDestroy, Component } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { Column } from '../../../../lib/data-set/column';
 
 @Component({
@@ -8,6 +8,7 @@ import { Column } from '../../../../lib/data-set/column';
 export class DefaultFilter implements Filter, OnDestroy {
 
   changesSubscription: Subscription;
+  protected destroy = new Subject<void>();
   @Input() delay = 300;
   @Input() query: string | boolean | number;
   @Input() inputClass: string;
@@ -18,6 +19,8 @@ export class DefaultFilter implements Filter, OnDestroy {
     if (this.changesSubscription) {
       this.changesSubscription.unsubscribe();
     }
+    this.destroy.next();
+    this.destroy.complete();
   }
 
   setFilter() {

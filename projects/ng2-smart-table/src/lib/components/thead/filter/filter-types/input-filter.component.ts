@@ -1,18 +1,18 @@
 import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, skip } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { DefaultFilter } from './default-filter';
 
 @Component({
   selector: 'input-filter',
   template: `
-    <input
-      [ngClass]="inputClass"
-      [formControl]="inputControl"
-      class="form-control"
-      type="text"
-      placeholder="{{ column.title }}"/>
-  `,
+		<input
+				[ngClass]="inputClass"
+				[formControl]="inputControl"
+				class="form-control"
+				type="text"
+				placeholder="{{ column.title }}"/>
+  `
 })
 export class InputFilterComponent extends DefaultFilter implements OnInit, OnChanges {
 
@@ -30,6 +30,7 @@ export class InputFilterComponent extends DefaultFilter implements OnInit, OnCha
       .pipe(
         distinctUntilChanged(),
         debounceTime(this.delay),
+        takeUntil(this.destroy)
       )
       .subscribe((value: string) => {
         this.query = value;

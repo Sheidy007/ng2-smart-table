@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import { fromEvent, of, Subject } from 'rxjs';
 import { Grid } from '../../../lib/grid';
 import { LocalDataSource } from '../../../lib/data-source/local.data-source';
@@ -58,7 +58,7 @@ import { debounceTime, first, switchMap, takeUntil } from 'rxjs/operators';
                background-color: black;
              }`]
 })
-export class TheadTitlesRowComponent implements OnChanges {
+export class TheadTitlesRowComponent implements OnChanges, OnDestroy {
 
   @Input() grid: Grid;
   @Input() isAllSelected: boolean;
@@ -84,7 +84,7 @@ export class TheadTitlesRowComponent implements OnChanges {
   oldWidthNext = [];
   oldWidthPrev = [];
   startPosX = 0;
-  destroy = new Subject<void>();
+  private destroy = new Subject<void>();
 
   ngOnChanges() {
     this.isMultiSelectVisible = this.grid.isMultiSelectVisible();
@@ -257,5 +257,10 @@ export class TheadTitlesRowComponent implements OnChanges {
       columns[id + 1].width = nextForLeft + realDiff + '%';
 
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy.next();
+    this.destroy.complete();
   }
 }

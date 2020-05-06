@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgControl } from '@angular/forms';
-import { distinctUntilChanged, debounceTime, skip } from 'rxjs/operators';
+import { distinctUntilChanged, debounceTime, skip, takeUntil } from 'rxjs/operators';
 import { DefaultFilter } from './default-filter';
 
 @Component({
@@ -31,7 +31,8 @@ export class SelectFilterComponent extends DefaultFilter implements OnInit {
       .pipe(
         skip(1),
         distinctUntilChanged(),
-        debounceTime(this.delay)
+        debounceTime(this.delay),
+        takeUntil(this.destroy)
       )
       .subscribe(() => this.setFilter());
   }
