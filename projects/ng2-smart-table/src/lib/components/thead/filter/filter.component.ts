@@ -7,19 +7,21 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./filter.component.scss'],
   template: `
 		<div class="ng2-smart-filter" *ngIf="column.filter" [ngSwitch]="column.getFilterType()">
-			<custom-table-filter *ngSwitchCase="'custom'"
-			                     [query]="query"
+			<custom-table-filter (filter)="onFilter($event)"
+			                     *ngSwitchCase="'custom'"
 			                     [column]="column"
-			                     [source]="source"
 			                     [inputClass]="inputClass"
-			                     (filter)="onFilter($event)">
+			                     [query]="query"
+			                     [settings]="settings"
+			                     [source]="source">
 			</custom-table-filter>
-			<default-table-filter *ngSwitchDefault
-			                      [query]="query"
+			<default-table-filter (filter)="onFilter($event)"
+			                      *ngSwitchDefault
 			                      [column]="column"
-			                      [source]="source"
 			                      [inputClass]="inputClass"
-			                      (filter)="onFilter($event)">
+			                      [query]="query"
+			                      [settings]="settings"
+			                      [source]="source">
 			</default-table-filter>
 		</div>
   `

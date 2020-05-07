@@ -6,6 +6,7 @@ export class SettingsClass {
   mode?: 'inline' | 'external' | 'click-to-edit' = 'inline';
   selectMode?: 'single' | 'multi' = 'single';
   multiCompare ? = false;
+  andOperator ? = true;
   hideHeader ? = false;
   hideSubHeader ? = false;
   actions?: ActionsClass;

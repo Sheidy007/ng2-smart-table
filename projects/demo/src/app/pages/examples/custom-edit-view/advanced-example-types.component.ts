@@ -9,7 +9,7 @@ import { Grid, LocalDataSource } from 'ng2-smart-table';
 @Component({
   selector: 'advanced-example-types',
   template: `
-    
+
 		<ng2-smart-table
 				*ngIf="data"
 				[settings]="settings"
@@ -20,7 +20,6 @@ import { Grid, LocalDataSource } from 'ng2-smart-table';
 				(createConfirm)="onCreateConfirm($event)"
 				(gridEmitResult)="onGridEmitResult($event)">
 		</ng2-smart-table>
-    
 		<ng2-smart-table-column-show
 				*ngIf="grid"
 				[grid]="grid">
@@ -100,6 +99,7 @@ export class AdvancedExamplesTypesComponent implements AfterViewInit {
       settingsName: 'testName',
       selectMode: 'multi',
       multiCompare: true,
+      andOperator: false,
       actions: {
         add: true,
         delete: true,

@@ -13,7 +13,7 @@
 		<td cdkDrag
 		    (mousedown)="grid.doDrgDrop = true"
 		    (mouseup)="grid.doDrgDrop = false">
-			<table [style.width]="'800px'">
+			<table [style.width]="'800px'" [style.tableLayout]="'fixed'">
 				<td [ngStyle]="{width:column.width,
 				    backgroundColor:column.show?'green':'yellow',
 				    whiteSpace: 'nowrap',

@@ -36,7 +36,7 @@ export class SorterSourceClass {
     } else {
       this.sortConf = {
         sorts: [],
-        multiSort: true
+        multiSort
       };
     }
     this.sortConf.multiSort = multiSort;
@@ -52,15 +52,15 @@ export class SorterSourceClass {
       this.sortConf.sorts = [];
     }
 
-    if (!fieldConf.direction) {
-      this.sortConf.sorts = this.sortConf.sorts.filter(s => s.field !== fieldConf.field);
-    } else {
+    if (fieldConf.direction) {
       const findSort = this.sortConf.sorts.find(s => s.field === fieldConf.field);
-      if (!findSort) {
-        this.sortConf.sorts.push(fieldConf);
-      } else {
+      if (findSort) {
         findSort.direction = fieldConf.direction;
+      } else {
+        this.sortConf.sorts.push(fieldConf);
       }
+    } else {
+      this.sortConf.sorts = this.sortConf.sorts.filter(s => s.field !== fieldConf.field);
     }
 
     this.sortConf.multiSort = multiSort;
@@ -71,13 +71,13 @@ export class SorterSourceClass {
     if (!this.sortConf.sorts || !this.sortConf.sorts.length) {
       return data;
     }
-    if (!this.sortConf.multiSort) {
+    if (this.sortConf.multiSort) {
+      data = LocalMultiSorter
+        .sort(data, this.sortConf.sorts);
+    } else {
       const fieldConf = this.sortConf.sorts[0];
       data = LocalSorter
         .sort(data, fieldConf.field, fieldConf.direction, fieldConf.compare);
-    } else {
-      data = LocalMultiSorter
-        .sort(data, this.sortConf.sorts);
     }
     return data;
   }

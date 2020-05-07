@@ -129,8 +129,8 @@ export class LocalDataSource {
         multiSort: false
       };
     } else {
-      this.setFilter([], true, false);
-      this.setSort([], false, false);
+      this.setFilter([], true, doEmit);
+      this.setSort([], doEmit, false);
     }
   }
 
@@ -185,7 +185,7 @@ export class LocalDataSource {
   }
 
   clearSort(doEmit: boolean = true) {
-    this.setSort([], doEmit, true);
+    this.setSort([], doEmit);
   }
 
   count(): number {

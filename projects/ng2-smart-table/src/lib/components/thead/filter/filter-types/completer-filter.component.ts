@@ -9,12 +9,11 @@ import { debounceTime, distinctUntilChanged, map, takeUntil } from 'rxjs/operato
   selector: 'completer-filter',
   template: `
 		<ng2-completer [(ngModel)]="query"
-		               (ngModelChange)="inputTextChanged($event)"
+		               (ngModelChange)="inputTextChanged($event); completerContent.next($event)"
 		               [dataService]="column.getFilterConfig().completer.dataService"
 		               [minSearchLength]="column.getFilterConfig().completer.minSearchLength || 0"
 		               [pause]="column.getFilterConfig().completer.pause || 0"
-		               [placeholder]="column.getFilterConfig().completer.placeholder || 'Start typing...'"
-		               (selected)="completerContent.next($event)">
+		               [placeholder]="column.getFilterConfig().completer.placeholder || 'Start typing...'">
 		</ng2-completer>
   `
 })
@@ -38,7 +37,6 @@ export class CompleterFilterComponent extends DefaultFilter implements OnInit {
 
     this.changesSubscription = this.completerContent
       .pipe(
-        map((ev: any) => (ev && ev.title) || ev || ''),
         distinctUntilChanged(),
         debounceTime(this.delay),
         takeUntil(this.destroy)

@@ -15,6 +15,7 @@ import { LocalDataSource } from '../../../lib/data-source/local.data-source';
 			</td>
 			<td *ngFor="let column of noHideColumns" class="ng2-smart-th {{ column.id }}">
 				<ng2-smart-table-filter [source]="source"
+				                        [settings]="grid.getSetting()"
 				                        [column]="column"
 				                        [inputClass]="filterInputClass"
 				                        (filter)="filter.emit($event)">
