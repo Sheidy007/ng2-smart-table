@@ -4,7 +4,7 @@ import { Grid } from '../../../lib/grid';
 import { LocalDataSource } from '../../../lib/data-source/local.data-source';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Column } from 'ng2-smart-table';
-import { debounceTime, first, switchMap, takeUntil } from 'rxjs/operators';
+import { debounceTime, finalize, switchMap, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: '[ng2-st-thead-titles-row]',
@@ -110,26 +110,6 @@ export class TheadTitlesRowComponent implements OnChanges {
     const id = columns.indexOf(column);
     this.setPreResize(event, el, columns, id);
 
-    const destroyMove = new Subject<void>();
-
-    fromEvent(window, 'mouseup')
-      .pipe(first(), takeUntil(this.destroy))
-      .subscribe(() => {
-        destroyMove.next();
-        this.grid.doResize = false;
-        columns = this.noHideColumns;
-        let widthSum = 0;
-        columns.forEach((col) => {
-          widthSum += parseInt(col.width, 10);
-        });
-        columns.forEach((col) => {
-          let w = Math.round(1000 / widthSum * parseInt(col.width, 10));
-          w = w > this.minColumnWidthFix ? w : this.minColumnWidthFix;
-          col.width = w + '%';
-        });
-        this.grid.getDataSet().setSettings();
-      });
-
     fromEvent(window, 'mousemove')
       .pipe(switchMap((e: MouseEvent) => {
           if (!this.grid.doResize) {
@@ -138,7 +118,21 @@ export class TheadTitlesRowComponent implements OnChanges {
           return of(e);
         }),
         debounceTime(15),
-        takeUntil(destroyMove),
+        finalize(() => {
+          this.grid.doResize = false;
+          columns = this.noHideColumns;
+          let widthSum = 0;
+          columns.forEach((col) => {
+            widthSum += parseInt(col.width, 10);
+          });
+          columns.forEach((col) => {
+            let w = Math.round(1000 / widthSum * parseInt(col.width, 10));
+            w = w > this.minColumnWidthFix ? w : this.minColumnWidthFix;
+            col.width = w + '%';
+          });
+          this.grid.getDataSet().setSettings();
+        }),
+        takeUntil(fromEvent(document, 'mouseup')),
         takeUntil(this.destroy))
       .subscribe((e: MouseEvent) => {
         this.makeResize(e, column);
