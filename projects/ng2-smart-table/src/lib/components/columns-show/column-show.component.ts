@@ -5,7 +5,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'ng2-smart-table-column-show',
-  styleUrls: ['./column-show.component.scss'],
+  styleUrls: ['./column-show.component.scss', '../../ng2-smart-table.component.scss'],
   templateUrl: './column-show.component.html'
 })
 export class ColumnShowComponent implements OnInit {
