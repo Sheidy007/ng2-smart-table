@@ -3,7 +3,7 @@ import { Subject } from 'rxjs';
 import { CompleterService } from '@akveo/ng2-completer';
 
 import { DefaultFilter } from './default-filter';
-import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'completer-filter',
@@ -40,7 +40,8 @@ export class CompleterFilterComponent extends DefaultFilter implements OnInit {
       .pipe(
         map((ev: any) => (ev && ev.title) || ev || ''),
         distinctUntilChanged(),
-        debounceTime(this.delay)
+        debounceTime(this.delay),
+        takeUntil(this.destroy)
       )
       .subscribe((search: string) => {
         this.query = search;

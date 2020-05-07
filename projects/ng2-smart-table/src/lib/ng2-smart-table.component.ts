@@ -1,16 +1,18 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChange } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChange } from '@angular/core';
 import { deepExtend } from './lib/helpers';
 import { Grid } from './lib/grid';
 import { Row } from './lib/data-set/row';
 import { LocalDataSource } from './lib/data-source/local.data-source';
 import { CustomActionResultClass, SettingsClass } from './lib/settings.class';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'ng2-smart-table',
   styleUrls: ['./ng2-smart-table.component.scss'],
   templateUrl: './ng2-smart-table.component.html'
 })
-export class Ng2SmartTableComponent implements OnChanges {
+export class Ng2SmartTableComponent implements OnChanges, OnDestroy {
 
   @Input() source: LocalDataSource | any;
   @Input() settings: SettingsClass;
@@ -39,6 +41,7 @@ export class Ng2SmartTableComponent implements OnChanges {
   rowClassFunction: () => string;
   grid: Grid;
   isAllSelected = false;
+  private destroy = new Subject<void>();
 
   ngOnChanges(changes: { [propertyName: string]: SimpleChange }) {
     if (this.grid) {
@@ -76,6 +79,7 @@ export class Ng2SmartTableComponent implements OnChanges {
       this.emitSelectRow(row);
     }
   }
+
   multipleSelectRow(row: Row) {
     if (this.grid.getSetting().selectMode === 'multi') {
       this.grid.multipleSelectRow(row);
@@ -109,8 +113,8 @@ export class Ng2SmartTableComponent implements OnChanges {
     this.source = this.prepareSource();
     this.settings = this.prepareSettings();
     this.grid = new Grid(this.settings, this.source);
-    this.grid.onSelectRowSource.subscribe((row) => this.emitSelectRow(row));
-    this.source.onGetAllGrid.subscribe(() => {
+    this.grid.onSelectRowSource.pipe(takeUntil(this.destroy)).subscribe((row) => this.emitSelectRow(row));
+    this.source.onGetAllGrid.pipe(takeUntil(this.destroy)).subscribe(() => {
       this.gridEmitResult.next(this.grid);
     });
   }
@@ -160,6 +164,11 @@ export class Ng2SmartTableComponent implements OnChanges {
       isSelected: row ? row.getIsSelected() : null,
       source: this.source
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy.next();
+    this.destroy.complete();
   }
 
 }

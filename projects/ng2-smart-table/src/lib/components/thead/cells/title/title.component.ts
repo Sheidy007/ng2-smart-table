@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Column } from '../../../../lib/data-set/column';
 import { SettingsClass } from '../../../../lib/settings.class';
@@ -24,7 +24,7 @@ import { LocalDataSource } from '../../../../lib/data-source/local.data-source';
 		</div>
   `
 })
-export class TitleComponent implements OnChanges {
+export class TitleComponent implements OnChanges, OnDestroy {
 
   @Input() column: Column;
   @Input() source: LocalDataSource;
@@ -41,7 +41,7 @@ export class TitleComponent implements OnChanges {
       if (!changes.source.firstChange) {
         this.dataChangedSub.unsubscribe();
       }
-      this.dataChangedSub = this.source.onChanged.subscribe((dataChanges) => {
+      this.dataChangedSub = this.source.onChanged.subscribe(() => {
         const sortConf = this.source.getSort().sorts;
         this.length = sortConf.length;
         if (sortConf.length) {
@@ -87,5 +87,11 @@ export class TitleComponent implements OnChanges {
         break;
     }
     return this.currentDirection;
+  }
+
+  ngOnDestroy(): void {
+    if (this.dataChangedSub) {
+      this.dataChangedSub.unsubscribe();
+    }
   }
 }

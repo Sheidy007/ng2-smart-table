@@ -8,11 +8,17 @@
     input:not([type='checkbox']),
     optgroup,
     select,
-    textarea  {
+    textarea {
       width: 100%;
     }
 
-    .user-select-none{
+    table {
+      table-layout: fixed;
+      border-collapse: collapse;
+      border-spacing: 0;
+    }
+
+    .user-select-none {
       pointer-events: none;
       -webkit-touch-callout: none;
       -webkit-user-select: none;

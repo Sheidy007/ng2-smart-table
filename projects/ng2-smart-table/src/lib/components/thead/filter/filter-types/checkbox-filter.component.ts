@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { DefaultFilter } from './default-filter';
-import { debounceTime } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'checkbox-filter',
@@ -24,6 +24,7 @@ export class CheckboxFilterComponent extends DefaultFilter implements OnInit {
 
   ngOnInit() {
     this.changesSubscription = this.inputControl.valueChanges
+      .pipe(takeUntil(this.destroy))
       .subscribe((checked: boolean) => {
         if (this.prevData === null) {
           this.prevData = true;

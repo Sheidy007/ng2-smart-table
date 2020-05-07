@@ -1,16 +1,29 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output,
+  QueryList,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
 
 import { Grid } from '../../lib/grid';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-import { fromEvent, Subscription, timer } from 'rxjs';
+import { fromEvent, Subject, Subscription, timer } from 'rxjs';
 import { LocalDataSource } from '../../lib/data-source/local.data-source';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: '[ng2-st-tbody]',
   styleUrls: ['./tbody.component.scss'],
   templateUrl: './tbody.component.html'
 })
-export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit {
+export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit, OnDestroy {
 
   @Input() grid: Grid;
   @Input() source: LocalDataSource;
@@ -40,7 +53,6 @@ export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit {
   isActionEdit: boolean;
   isActionDelete: boolean;
   noDataMessage: string;
-  timer: Subscription;
   elements: { element: HTMLElement, row: any, visible: boolean }[] = [];
 
   @ViewChild(CdkVirtualScrollViewport, { static: false }) viewport: CdkVirtualScrollViewport;
@@ -59,14 +71,17 @@ export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit {
     return this.noHideColumns.length + actionColumns;
   }
 
+  private timer = new Subscription();
+  private destroy = new Subject<void>();
+
   ngAfterViewInit() {
     this.grid.pagingSource.viewport = this.viewport;
 
-    this.rowElements.changes.subscribe((data) => {
+    this.rowElements.changes.pipe(takeUntil(this.destroy)).subscribe((data) => {
       this.checkElementsIsVisible(data.toArray().map(e => e.nativeElement) as HTMLElement[]);
     });
 
-    this.multipleSelectCheckBox.changes.subscribe((data) => {
+    this.multipleSelectCheckBox.changes.pipe(takeUntil(this.destroy)).subscribe((data) => {
       const multipleSelectCheckBoxEl = (data.toArray().map(e => e.nativeElement) as HTMLElement[]);
       if (multipleSelectCheckBoxEl && multipleSelectCheckBoxEl.length) {
         const el = multipleSelectCheckBoxEl[0];
@@ -87,7 +102,7 @@ export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit {
     if (this.showActionColumnLeft || this.showActionColumnRight) {
       [this.actionsUpdate, this.actionsLeft, this.actionsRight].forEach(
         actions => {
-          actions.changes.subscribe((data) => {
+          actions.changes.pipe(takeUntil(this.destroy)).subscribe((data) => {
             const showActionEl = (data.toArray().map(e => e.nativeElement) as HTMLElement[]);
             if (showActionEl && showActionEl.length) {
               const el = showActionEl[0];
@@ -107,15 +122,13 @@ export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit {
         });
     }
 
-    fromEvent(window, 'resize').subscribe(() => {
+    fromEvent(window, 'resize').pipe(takeUntil(this.destroy)).subscribe(() => {
       this.viewport.checkViewportSize();
     });
   }
 
   onScroll() {
-    if (this.timer) {
-      this.timer.unsubscribe();
-    }
+    this.timer.unsubscribe();
     this.timer = timer(100).subscribe(() => {
       this.checkElementsIsVisible();
       const el = this.elements.filter(f => f.visible).slice(-1)[0];
@@ -165,5 +178,11 @@ export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit {
     this.isActionEdit = this.grid.getSetting().actions ? this.grid.getSetting().actions.edit : false;
     this.isActionDelete = this.grid.getSetting().actions ? this.grid.getSetting().actions.delete : false;
     this.noDataMessage = this.grid.getSetting().noDataMessage;
+  }
+
+  ngOnDestroy(): void {
+    this.timer.unsubscribe();
+    this.destroy.next();
+    this.destroy.complete();
   }
 }
