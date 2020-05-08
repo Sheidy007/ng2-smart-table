@@ -148,8 +148,12 @@ export class DataSet {
     return this.columns;
   }
 
-  getNoHidColumns(): Column[] {
+  getNoHideColumns(): Column[] {
     return this.columns.filter(c => c.show);
+  }
+
+  getHideColumns(): Column[] {
+    return this.columns.filter(c => !c.show);
   }
 
   getRows(): Row[] {

@@ -103,8 +103,9 @@ export class AdvancedExamplesTypesComponent implements AfterViewInit {
       actions: {
         add: true,
         delete: true,
-        edit: true
-        , custom: [
+        edit: true,
+        showHiddenColumns: true,
+         custom: [
           {
             name: 'view',
             title: 'View '

@@ -1,22 +1,11 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  Output,
-  QueryList,
-  ViewChild,
-  ViewChildren
-} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 
 import { Grid } from '../../lib/grid';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { fromEvent, Subject, Subscription, timer } from 'rxjs';
 import { LocalDataSource } from '../../lib/data-source/local.data-source';
 import { takeUntil } from 'rxjs/operators';
+import { Row } from '../../lib/data-set/row';
 
 @Component({
   selector: '[ng2-st-tbody]',
@@ -47,6 +36,7 @@ export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit, On
   isMultiSelectVisible: boolean;
   showActionColumnLeft: boolean;
   showActionColumnRight: boolean;
+  showColumnForShowHiddenColumns: boolean;
   mode: 'inline' | 'external' | 'click-to-edit';
   editInputClass: string;
   isActionAdd: boolean;
@@ -61,6 +51,7 @@ export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit, On
   @ViewChildren('actionsLeft') actionsLeft: QueryList<ElementRef>;
   @ViewChildren('actionsRight') actionsRight: QueryList<ElementRef>;
   @ViewChildren('actionsUpdate') actionsUpdate: QueryList<ElementRef>;
+  @ViewChildren('actionShowHiddenColumns') actionShowHiddenColumns: QueryList<ElementRef>;
 
   get noHideColumns() {
     return this.grid.getNoHideColumns();
@@ -122,6 +113,24 @@ export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit, On
         });
     }
 
+    this.actionShowHiddenColumns.changes.pipe(takeUntil(this.destroy)).subscribe((data) => {
+      const actionShowHiddenColumnsEl = (data.toArray().map(e => e.nativeElement) as HTMLElement[]);
+      if (actionShowHiddenColumnsEl && actionShowHiddenColumnsEl.length) {
+        const el = actionShowHiddenColumnsEl[0];
+        const style = window.getComputedStyle(el);
+        const width = el.offsetWidth;
+        const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+        const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+        const border = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
+        if (parseInt(this.grid.widthShowHiddenColumns, 10) < width + margin - padding + border + 5) {
+          setTimeout(() => {
+              this.grid.widthShowHiddenColumns = width + margin - padding + border + 5 + 'px';
+            }
+            , 10);
+        }
+      }
+    });
+
     fromEvent(window, 'resize').pipe(takeUntil(this.destroy)).subscribe(() => {
       this.viewport.checkViewportSize();
     });
@@ -168,10 +177,20 @@ export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit, On
       (targetPosition.top + targetPosition.bottom) / 2 >= parentPosition.top;
   }
 
+  showHiddenColumns(row: Row) {
+    this.grid.getRows().forEach((r) => {
+      if (r !== row) {
+        r.showHiddenColumns = false;
+      }
+    });
+    row.showHiddenColumns = !row.showHiddenColumns;
+  }
+
   ngOnChanges() {
     this.isMultiSelectVisible = this.grid.isMultiSelectVisible();
     this.showActionColumnLeft = this.grid.showActionColumn('left');
     this.showActionColumnRight = this.grid.showActionColumn('right');
+    this.showColumnForShowHiddenColumns = this.grid.showColumnForShowHiddenColumn();
     this.mode = this.grid.getSetting().mode;
     this.editInputClass = this.grid.getSetting().edit ? this.grid.getSetting().edit.inputClass : '';
     this.isActionAdd = this.grid.getSetting().actions ? this.grid.getSetting().actions.add : false;

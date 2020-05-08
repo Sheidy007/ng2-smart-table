@@ -44,6 +44,10 @@ import { debounceTime, finalize, switchMap, takeUntil } from 'rxjs/operators';
 			<td ng2-st-actions-title *ngIf="showActionColumnRight"
 			    [grid]="grid"
 			    [ngStyle]="{width : grid.widthActions}"></td>
+			<td *ngIf="showColumnForShowHiddenColumns  && grid.getHideColumns().length"
+			    [ngStyle]="{width : grid.widthShowHiddenColumns}">
+				{{grid.getSetting().showHiddenColumns.title}}
+			</td>
 		</tr>
   `,
   styles: [`
@@ -79,6 +83,7 @@ export class TheadTitlesRowComponent implements OnChanges, OnDestroy {
   isMultiSelectVisible: boolean;
   showActionColumnLeft: boolean;
   showActionColumnRight: boolean;
+  showColumnForShowHiddenColumns: boolean;
   oldWidth = 0;
   oldPercent = 0;
   oldWidthNext = [];
@@ -90,6 +95,7 @@ export class TheadTitlesRowComponent implements OnChanges, OnDestroy {
     this.isMultiSelectVisible = this.grid.isMultiSelectVisible();
     this.showActionColumnLeft = this.grid.showActionColumn('left');
     this.showActionColumnRight = this.grid.showActionColumn('right');
+    this.showColumnForShowHiddenColumns = this.grid.showColumnForShowHiddenColumn();
   }
 
   drop(event: CdkDragDrop<string[]>) {

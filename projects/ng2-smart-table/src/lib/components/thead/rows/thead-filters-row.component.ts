@@ -27,6 +27,9 @@ import { LocalDataSource } from '../../../lib/data-source/local.data-source';
 			    (create)="create.emit($event)"
 			    [ngStyle]="{width : grid.widthActions}">
 			</td>
+			<td *ngIf="showColumnForShowHiddenColumns && grid.getHideColumns().length"
+			    [ngStyle]="{width : grid.widthShowHiddenColumns}">
+			</td>
 		</tr>
   `
 })
@@ -41,6 +44,7 @@ export class TheadFiltersRowComponent implements OnChanges {
   isMultiSelectVisible: boolean;
   showActionColumnLeft: boolean;
   showActionColumnRight: boolean;
+  showColumnForShowHiddenColumns: boolean;
   filterInputClass: string;
 
   get noHideColumns() {
@@ -51,6 +55,7 @@ export class TheadFiltersRowComponent implements OnChanges {
     this.isMultiSelectVisible = this.grid.isMultiSelectVisible();
     this.showActionColumnLeft = this.grid.showActionColumn('left');
     this.showActionColumnRight = this.grid.showActionColumn('right');
+    this.showColumnForShowHiddenColumns = this.grid.showColumnForShowHiddenColumn();
     this.filterInputClass = this.grid.getSetting().filter ? this.grid.getSetting().filter.inputClass : '';
   }
 }

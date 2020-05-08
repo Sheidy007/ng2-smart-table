@@ -14,6 +14,7 @@ export class SettingsClass {
   edit?: EditClass;
   add?: AddClass;
   delete?: DeleteClass;
+  showHiddenColumns?: HiddenColumns;
   attr?: AttributeClass = new AttributeClass();
   noDataMessage ? = 'No data found';
   columns: { [name: string]: Column } = {};
@@ -35,8 +36,11 @@ export class SettingsClass {
         if (this.actions.delete && !this.delete) {
           this.delete = new DeleteClass();
         }
+        if (this.actions.showHiddenColumns && !this.showHiddenColumns) {
+          this.showHiddenColumns = new HiddenColumns();
+        }
       } else {
-        if (this.add || this.edit || this.delete) {
+        if (me.add || me.edit || me.delete || me.showHiddenColumns) {
           this.actions = new ActionsClass();
           if (this.add) {
             this.actions.add = true;
@@ -52,6 +56,11 @@ export class SettingsClass {
             this.actions.delete = true;
             this.delete = new DeleteClass();
             Object.keys(me.delete).forEach(key => this.delete[key] = me.delete[key]);
+          }
+          if (this.showHiddenColumns) {
+            this.actions.showHiddenColumns = true;
+            this.showHiddenColumns = new HiddenColumns();
+            Object.keys(me.showHiddenColumns).forEach(key => this.delete[key] = me.showHiddenColumns[key]);
           }
         }
       }
@@ -75,7 +84,7 @@ export class SettingsClass {
     this.columns = {};
     this.pager = new PagerClass();
     this.rowClassFunction = (...arg) => '';
-  }
+  };
 }
 
 export class ActionsClass {
@@ -84,6 +93,7 @@ export class ActionsClass {
   add  ? = false;
   edit ? = false;
   delete ? = false;
+  showHiddenColumns ? = false;
   custom ?: CustomActionClass[] = [];
 }
 
@@ -107,6 +117,12 @@ export class DeleteClass {
   inputClass ? = '';
   deleteButtonContent ? = 'Delete ';
   confirmDelete ? = false;
+}
+
+export class HiddenColumns {
+  title ? = 'Show other';
+  clickHtmlObject ? = '<a href="#">Show other</a>';
+  gridView ?: string;
 }
 
 export class CustomActionClass {

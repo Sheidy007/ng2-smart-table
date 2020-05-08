@@ -6,15 +6,11 @@ export class Row {
 
   isSelected = false;
   isInEditing = false;
-  cells: Array<Cell> = [];
-
-
+  showHiddenColumns = false;
+  cells: Cell[] = [];
+  hiddenCells: Cell[] = [];
   constructor(public index: number, protected data: any, protected dataSet: DataSet) {
     this.process();
-  }
-
-  getCell(column: Column): Cell {
-    return this.cells.find(el => el.getColumn() === column);
   }
 
   getCells() {
@@ -42,9 +38,14 @@ export class Row {
 
   process() {
     this.cells = [];
-    this.dataSet.getNoHidColumns().forEach((column: Column) => {
+    this.dataSet.getNoHideColumns().forEach((column: Column) => {
       const cell = this.createCell(column);
       this.cells.push(cell);
+    });
+    this.hiddenCells = [];
+    this.dataSet.getHideColumns().forEach((column: Column) => {
+      const cell = this.createCell(column);
+      this.hiddenCells.push(cell);
     });
   }
 

@@ -29,6 +29,9 @@ import { Row } from '../../../lib/data-set/row';
 			    class="ng2-smart-actions">
 				<ng2-st-actions [grid]="grid" (create)="onCreate($event)"></ng2-st-actions>
 			</td>
+			<td *ngIf="showColumnForShowHiddenColumns  && grid.getHideColumns().length"
+			    [ngStyle]="{width : grid.widthShowHiddenColumns}">
+			</td>
 		</tr>
   `
 })
@@ -43,6 +46,7 @@ export class TheadFormRowComponent implements OnChanges {
   isMultiSelectVisible: boolean;
   showActionColumnLeft: boolean;
   showActionColumnRight: boolean;
+  showColumnForShowHiddenColumns: boolean;
   addInputClass: string;
 
   onCreate(event: any) {
@@ -54,6 +58,7 @@ export class TheadFormRowComponent implements OnChanges {
     this.isMultiSelectVisible = this.grid.isMultiSelectVisible();
     this.showActionColumnLeft = this.grid.showActionColumn('left');
     this.showActionColumnRight = this.grid.showActionColumn('right');
+    this.showColumnForShowHiddenColumns = this.grid.showColumnForShowHiddenColumn();
     this.addInputClass = this.grid.getSetting().add.inputClass;
   }
 }

@@ -18,6 +18,7 @@ export class Grid {
   dataSet: DataSet;
   widthMultipleSelectCheckBox = '0px';
   widthActions = '0px';
+  widthShowHiddenColumns = '0px';
   doResize = false;
   doDrgDrop = false;
 
@@ -33,6 +34,10 @@ export class Grid {
 
   showActionColumn(position: 'left' | 'right'): boolean {
     return this.isActionsVisible() && position === this.settings.actions.position;
+  }
+
+  showColumnForShowHiddenColumn(): boolean {
+    return this.settings.actions.showHiddenColumns;
   }
 
   isActionsVisible(): boolean {
@@ -82,10 +87,14 @@ export class Grid {
   }
 
   getNoHideColumns(): Column[] {
-    return this.dataSet.getNoHidColumns();
+    return this.dataSet.getNoHideColumns();
   }
 
-  getRows(): Array<Row> {
+  getHideColumns(): Column[] {
+    return this.dataSet.getHideColumns();
+  }
+
+  getRows(): Row[] {
     return this.dataSet.getRows();
   }
 
