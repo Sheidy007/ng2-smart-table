@@ -99,23 +99,25 @@
 				</tr>
 				<tr *ngIf="row.showHiddenColumns && grid.getHideColumns().length">
 					<td *ngIf="isMultiSelectVisible"></td>
-					<td *ngIf="!row.isInEditing && showActionColumnLeft"></td>
+					<td *ngIf="showActionColumnLeft"></td>
 					<td [attr.colspan]="'100'">
-						<div [style.display]="'grid'">
-							<div *ngFor="let cell of row.hiddenCells"
-							     [ngStyle]="{display:'flex', flexWrap:'nowrap'}">
-								<div class="ng2-smart-hidden-title">{{cell.getTitle()}}:</div>
-								<ng2-smart-table-cell [cell]="cell"
-								                      [grid]="grid"
-								                      [row]="row"
-								                      [isNew]="false"
-								                      [mode]="mode"
-								                      [editConfirm]="editConfirm"
-								                      [inputClass]="editInputClass"
-								                      [isInEditing]="row.isInEditing">
-								</ng2-smart-table-cell>
-							</div>
-						</div>
+						<table [style.tableLayout]="'auto'">
+							<tr *ngFor="let cell of row.hiddenCells">
+								<td class="ng2-smart-hidden-title">{{cell.getTitle()}}:</td>
+								<td>
+									<ng2-smart-table-cell [style.width]="'100%'"
+									                      [cell]="cell"
+									                      [grid]="grid"
+									                      [row]="row"
+									                      [isNew]="false"
+									                      [mode]="mode"
+									                      [editConfirm]="editConfirm"
+									                      [inputClass]="editInputClass"
+									                      [isInEditing]="row.isInEditing">
+									</ng2-smart-table-cell>
+								</td>
+							</tr>
+						</table>
 					</td>
 				</tr>
 			</ng-container>
