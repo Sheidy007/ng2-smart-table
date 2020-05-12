@@ -4,26 +4,48 @@ import { ButtonViewComponent } from './basic-example-button-view.component';
 import { CustomEditorComponent } from './custom-editor.component';
 import { CustomRenderComponent } from './custom-render.component';
 import { CustomFilterComponent } from './custom-filter.component';
-import { Grid, LocalDataSource } from 'ng2-smart-table';
+import { Grid, LocalDataSource, Row } from 'ng2-smart-table';
 
 @Component({
   selector: 'advanced-example-types',
   template: `
-
-		<ng2-smart-table
-				*ngIf="data"
-				[settings]="settings"
-				[source]="data"
-				(custom)="onCustom($event)"
-				(deleteConfirm)="onDeleteConfirm($event)"
-				(editConfirm)="onSaveConfirm($event)"
-				(createConfirm)="onCreateConfirm($event)"
-				(gridEmitResult)="onGridEmitResult($event)">
-		</ng2-smart-table>
-		<ng2-smart-table-column-show
-				*ngIf="grid"
-				[grid]="grid">
-		</ng2-smart-table-column-show>
+	  <h4>Основная таблица:</h4>
+	  <ng2-smart-table
+			  style="margin:1rem;padding:1rem;background-color: #e9ebec  ;display: block"
+			  *ngIf="data"
+			  [settings]="settings"
+			  [source]="data"
+			  (custom)="onCustom($event)"
+			  (createConfirm)="onCreateConfirm($event)"
+			  (create)="onCreateRowEvent($event)"
+			  (edit)="onEditRowEvent($event)"
+			  (saveUpdateConfirm)="onSaveConfirm($event)"
+			  (deleteConfirm)="onDeleteConfirm($event)"
+			  (gridEmitResult)="onGridEmitResult($event)">
+	  </ng2-smart-table>
+	  <h4>Показ колонок:</h4>
+	  <ng2-smart-table-column-show
+			  style="margin:1rem;padding:1rem;background-color: #e9ebec ;display: block"
+			  *ngIf="grid"
+			  [grid]="grid">
+	  </ng2-smart-table-column-show>
+	  <h4>Редактирование строки и создание новой:</h4>
+	  <ng2-smart-row-edit-separate
+			  style="margin:1rem;padding:1rem;background-color: #e9ebec ;display: block"
+			  *ngIf="grid && editRow"
+			  [editingRow]="editRow"
+			  [grid]="grid"
+			  (saveUpdateConfirm)="onSaveConfirm($event)"
+			  (finishEditRowSelect)="onEditRowEvent($event)">
+	  </ng2-smart-row-edit-separate>
+	  <ng2-smart-row-create-separate
+			  style="margin:1rem;padding:1rem;background-color: #e9ebec ;display: block"
+			  *ngIf="grid && createRow"
+			  [creatingRow]="createRow"
+			  [grid]="grid"
+			  (createConfirm)="onCreateConfirm($event)"
+			  (finishEditRowCreating)="onCreateRowEvent($event)">
+	  </ng2-smart-row-create-separate>
   `
 })
 export class AdvancedExamplesTypesComponent implements AfterViewInit {
@@ -87,6 +109,8 @@ export class AdvancedExamplesTypesComponent implements AfterViewInit {
   ];
   settings: SettingsClass;
   grid: Grid;
+  editRow: Row;
+  createRow: Row;
   constructor() {
     let dt = [];
     for (let i = 0; i < 10; i++) {
@@ -100,12 +124,14 @@ export class AdvancedExamplesTypesComponent implements AfterViewInit {
       selectMode: 'multi',
       multiCompare: true,
       andOperator: false,
+      editSeparate: true,
+      createSeparate: true,
       actions: {
         add: true,
         delete: true,
         edit: true,
         showHiddenColumns: true,
-         custom: [
+        custom: [
           {
             name: 'view',
             title: 'View '
@@ -118,7 +144,10 @@ export class AdvancedExamplesTypesComponent implements AfterViewInit {
       },
       delete: {
         confirmDelete: true,
-        deleteButtonContent: 'Rem'
+        deleteButtonContent: `<button>Remove</button>`
+      },
+      edit: {
+        confirmSave: true
       },
       columns: {
         id: {
@@ -126,6 +155,10 @@ export class AdvancedExamplesTypesComponent implements AfterViewInit {
           filter: {
             type: 'custom',
             component: CustomFilterComponent
+          },
+          editSeparateGrid: {
+            index: 1,
+            width: '50%'
           }
         },
         name: {
@@ -149,6 +182,10 @@ export class AdvancedExamplesTypesComponent implements AfterViewInit {
                 titleField: 'name'
               }
             }
+          },
+          editSeparateGrid: {
+            index: 0,
+            width: '50%'
           }
         },
         username: {
@@ -187,7 +224,8 @@ export class AdvancedExamplesTypesComponent implements AfterViewInit {
           title: 'Comments',
           editor: {
             type: 'textarea'
-          }
+          },
+          editable: false
         },
         passed: {
           title: 'Passed'
@@ -267,5 +305,13 @@ export class AdvancedExamplesTypesComponent implements AfterViewInit {
 
   onGridEmitResult(event) {
     this.grid = event;
+  }
+
+  onEditRowEvent(event) {
+    this.editRow = event;
+  }
+
+  onCreateRowEvent(event) {
+    this.createRow = event;
   }
 }

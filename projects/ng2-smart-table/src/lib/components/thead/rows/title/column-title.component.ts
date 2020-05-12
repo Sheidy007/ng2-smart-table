@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
-import { Column } from '../../../lib/data-set/column';
-import { SettingsClass } from '../../../lib/settings.class';
-import { LocalDataSource } from '../../../lib/data-source/local.data-source';
+import { Column } from '../../../../lib/data-set/column/column';
+import { SettingsClass } from '../../../../lib/settings.class';
+import { LocalDataSource } from '../../../../lib/data-source/local.data-source';
 
 @Component({
   selector: 'ng2-st-column-title',

@@ -1,10 +1,11 @@
 export * from './lib/ng2-smart-table.module';
 export * from './lib/ng2-smart-table.component';
 export { ViewCell } from './lib/components/tbody/cells/cell/cell-view-mode/view-cell';
-export { DefaultEditor, Editor } from './lib/components/tbody/cells/cell/cell-editors/default-editor';
-export { DefaultFilter, Filter } from './lib/components/thead/filter/filter-types/default-filter';
-export { Cell } from './lib/lib/data-set/cell';
-export { Column } from './lib/lib/data-set/column';
+export { DefaultEditor, Editor } from './lib/components/tbody/cells/cell/cell-edit-mode/cell-editors/default-editor';
+export { DefaultFilter, Filter } from './lib/components/thead/rows/filter/filter-types/default-filter';
+export { Row } from './lib/lib/data-set/row/row';
+export { Cell } from './lib/lib/data-set/row/cell/cell';
+export { Column } from './lib/lib/data-set/column/column';
 export { Grid } from './lib/lib/grid';
 export { LocalDataSource } from './lib/lib/data-source/local.data-source';
 export { SettingsClass } from './lib/lib/settings.class';

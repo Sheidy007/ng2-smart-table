@@ -1,12 +1,13 @@
 import { LocalDataSource } from './data-source/local.data-source';
-import { Column } from './data-set/column';
+import { Column } from './data-set/column/column';
 
 export class SettingsClass {
   settingsName ? = '';
-  mode?: 'inline' | 'external' | 'click-to-edit' = 'inline';
   selectMode?: 'single' | 'multi' = 'single';
   multiCompare ? = false;
   andOperator ? = true;
+  editSeparate ? = false;
+  createSeparate ? = false;
   hideHeader ? = false;
   hideSubHeader ? = false;
   actions?: ActionsClass;
@@ -19,7 +20,7 @@ export class SettingsClass {
   noDataMessage ? = 'No data found';
   columns: { [name: string]: Column } = {};
   pager?: PagerClass = new PagerClass();
-  rowClassFunction?: (...arg) => string = (...arg) => '';
+  rowClassFunction?: (...arg) => string = () => '';
 
   constructor(me?: SettingsClass) {
     if (me) {
@@ -70,7 +71,6 @@ export class SettingsClass {
   }
 
   private setDefault ? = () => {
-    this.mode = 'inline';
     this.selectMode = 'single';
     this.hideHeader = false;
     this.hideSubHeader = false;
@@ -83,8 +83,8 @@ export class SettingsClass {
     this.noDataMessage = 'No data found';
     this.columns = {};
     this.pager = new PagerClass();
-    this.rowClassFunction = (...arg) => '';
-  };
+    this.rowClassFunction = () => '';
+  }
 }
 
 export class ActionsClass {
@@ -121,8 +121,8 @@ export class DeleteClass {
 
 export class HiddenColumns {
   title ? = 'Show other';
-  clickHtmlObject ? = '<a href="#">Show other</a>';
-  gridView ?: string;
+  clickHtmlObjectShow ? = '<a href="#">Show other</a>';
+  clickHtmlObjectHide ? = '<a href="#">Hide other</a>';
 }
 
 export class CustomActionClass {

@@ -1,20 +1,17 @@
-import { Cell } from './cell';
-import { Column } from './column';
-import { DataSet } from './data-set';
+import { Cell } from './cell/cell';
+import { Column } from '../column/column';
+import { DataSet } from '../data-set';
 
 export class Row {
 
   isSelected = false;
-  isInEditing = false;
+  editing = false;
   showHiddenColumns = false;
+  allCells: Cell[] = [];
   cells: Cell[] = [];
   hiddenCells: Cell[] = [];
   constructor(public index: number, protected data: any, protected dataSet: DataSet) {
     this.process();
-  }
-
-  getCells() {
-    return this.cells;
   }
 
   getData(): any {
@@ -27,7 +24,13 @@ export class Row {
 
   getNewData(): any {
     const values = Object.assign({}, this.data);
-    this.getCells().forEach((cell) => values[cell.getColumn().id] = cell.newValue);
+    this.allCells.forEach((cell) => values[cell.getColumn().id] = cell.newValue);
+    return values;
+  }
+
+  resetNewData(): any {
+    const values = Object.assign({}, this.data);
+    this.allCells.forEach((cell) => cell.newValue = values[cell.getColumn().id]);
     return values;
   }
 
@@ -37,15 +40,13 @@ export class Row {
   }
 
   process() {
+    this.allCells = [];
     this.cells = [];
-    this.dataSet.getNoHideColumns().forEach((column: Column) => {
-      const cell = this.createCell(column);
-      this.cells.push(cell);
-    });
     this.hiddenCells = [];
-    this.dataSet.getHideColumns().forEach((column: Column) => {
+    this.dataSet.getColumns().forEach((column: Column) => {
       const cell = this.createCell(column);
-      this.hiddenCells.push(cell);
+      this.allCells.push(cell);
+      column.show ? this.cells.push(cell) : this.hiddenCells.push(cell);
     });
   }
 

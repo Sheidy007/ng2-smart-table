@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { Cell } from '../../../../../lib/data-set/cell';
+import { Cell } from '../../../../../lib/data-set/row/cell/cell';
 
 @Component({
   selector: 'table-cell-view-mode',
@@ -15,7 +15,7 @@ import { Cell } from '../../../../../lib/data-set/cell';
 			     , textOverflow:'ellipsis'}"
 			     *ngSwitchDefault>{{ cell.getValue() }}</div>
 			<div *ngSwitchCase="'html'"
-			     [innerHTML]="cell.getValue()"
+			     [innerHTML]="cell.getValue() | sanitizeHtml"
 			     [ngStyle]="{overflow:'hidden'}"
 			     class="table-cell-view-html"></div>
 			<custom-view-component *ngSwitchCase="'custom'"

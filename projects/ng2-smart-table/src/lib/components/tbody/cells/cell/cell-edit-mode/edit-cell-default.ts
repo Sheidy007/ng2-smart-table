@@ -1,6 +1,6 @@
 import { Component, Output, EventEmitter, Input } from '@angular/core';
 
-import { Cell } from '../../../../../lib/data-set/cell';
+import { Cell } from '../../../../../lib/data-set/row/cell/cell';
 
 @Component({
   template: ''
@@ -18,7 +18,7 @@ export class EditCellDefault {
   }
 
   onStopEditing(): boolean {
-    this.cell.getRow().isInEditing = false;
+    this.cell.getRow().editing = false;
     return false;
   }
 

@@ -1,5 +1,5 @@
-import { Row } from './row';
-import { Column } from './column';
+import { Row } from './row/row';
+import { Column } from './column/column';
 
 export class DataSet {
 
@@ -139,7 +139,7 @@ export class DataSet {
 
   createNewRow() {
     this.newRow = new Row(-1, {}, this);
-    this.newRow.isInEditing = true;
+    this.newRow.editing = true;
   }
 
   // get

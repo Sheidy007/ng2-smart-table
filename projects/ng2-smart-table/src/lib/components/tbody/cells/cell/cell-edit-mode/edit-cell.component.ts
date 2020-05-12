@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
-import { Cell } from '../../../../../lib/data-set/cell';
+import { Cell } from '../../../../../lib/data-set/row/cell/cell';
 
 @Component({
   selector: 'table-cell-edit-mode',

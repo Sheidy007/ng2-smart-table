@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { Column } from '../../../lib/data-set/column';
-import { FilterClass } from '../../../lib/data-source/data-source.class';
-import { LocalDataSource } from '../../../lib/data-source/local.data-source';
-import { SettingsClass } from '../../../lib/settings.class';
+import { Column } from '../../../../lib/data-set/column/column';
+import { FilterClass } from '../../../../lib/data-source/data-source.class';
+import { LocalDataSource } from '../../../../lib/data-source/local.data-source';
+import { SettingsClass } from '../../../../lib/settings.class';
 
 @Component({
   template: ''

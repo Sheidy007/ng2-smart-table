@@ -185,6 +185,8 @@ export class PagerComponent implements OnInit {
 
   reSetSettings() {
     this.grid.getDataSet().resetSettings();
+    setTimeout(() =>
+      this.grid.source.setFilter(this.grid.source.getFilter().filters, true, true), 1);
   }
   reSetFilters() {
     this.grid.source.clearFilter();

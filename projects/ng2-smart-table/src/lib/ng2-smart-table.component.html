@@ -2,9 +2,10 @@
      [id]="tableId"
      [ngClass]="[tableClass,
       grid.doResize?'user-select-none':'']">
-	<div (create)="create.emit($event)"
+	<div (create)="createRow($event)"
 	     (filter)="filter($event)"
 	     (selectAllRows)="onSelectAllRows($event)"
+	     (finishEditRowCreating)="create.emit(null)"
 	     (sort)="sort($event)"
 	     *ngIf="!isHideHeader || !isHideSubHeader"
 	     [createConfirm]="createConfirm"
@@ -15,14 +16,14 @@
 	     ng2-st-thead
 	>
 	</div>
-	<div (custom)="custom.emit($event)" (delete)="delete.emit($event)"
-	     (edit)="edit.emit($event)"
+	<div (custom)="custom.emit($event)"
 	     (editRowSelect)="editRowSelect($event)"
+	     (finishEditRowSelect)="edit.emit(null)"
 	     (multipleSelectRow)="multipleSelectRow($event)"
 	     (rowHover)="onRowHover($event)"
 	     (userSelectRow)="onUserSelectRow($event)"
 	     [deleteConfirm]="deleteConfirm"
-	     [editConfirm]="editConfirm"
+	     [saveUpdateConfirm]="saveUpdateConfirm"
 	     [grid]="grid"
 	     [minTableHeight]="minTableHeight"
 	     [rowClassFunction]="rowClassFunction"

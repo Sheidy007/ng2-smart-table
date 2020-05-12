@@ -5,7 +5,7 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { fromEvent, Subject, Subscription, timer } from 'rxjs';
 import { LocalDataSource } from '../../lib/data-source/local.data-source';
 import { takeUntil } from 'rxjs/operators';
-import { Row } from '../../lib/data-set/row';
+import { Row } from '../../lib/data-set/row/row';
 
 @Component({
   selector: '[ng2-st-tbody]',
@@ -17,19 +17,18 @@ export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit, On
   @Input() grid: Grid;
   @Input() source: LocalDataSource;
   @Input() deleteConfirm: EventEmitter<any>;
-  @Input() editConfirm: EventEmitter<any>;
+  @Input() saveUpdateConfirm: EventEmitter<any>;
   @Input() rowClassFunction: (...arg) => string;
   @Input() rowHeight: number;
   @Input() minTableHeight: string;
 
   @Output() save = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<any>();
-  @Output() edit = new EventEmitter<any>();
-  @Output() delete = new EventEmitter<any>();
   @Output() custom = new EventEmitter<any>();
   @Output() edited = new EventEmitter<any>();
   @Output() userSelectRow = new EventEmitter<any>();
   @Output() editRowSelect = new EventEmitter<any>();
+  @Output() finishEditRowSelect = new EventEmitter<any>();
   @Output() multipleSelectRow = new EventEmitter<any>();
   @Output() rowHover = new EventEmitter<any>();
 
@@ -37,7 +36,6 @@ export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit, On
   showActionColumnLeft: boolean;
   showActionColumnRight: boolean;
   showColumnForShowHiddenColumns: boolean;
-  mode: 'inline' | 'external' | 'click-to-edit';
   editInputClass: string;
   isActionAdd: boolean;
   isActionEdit: boolean;
@@ -191,7 +189,6 @@ export class Ng2SmartTableTbodyComponent implements OnChanges, AfterViewInit, On
     this.showActionColumnLeft = this.grid.showActionColumn('left');
     this.showActionColumnRight = this.grid.showActionColumn('right');
     this.showColumnForShowHiddenColumns = this.grid.showColumnForShowHiddenColumn();
-    this.mode = this.grid.getSetting().mode;
     this.editInputClass = this.grid.getSetting().edit ? this.grid.getSetting().edit.inputClass : '';
     this.isActionAdd = this.grid.getSetting().actions ? this.grid.getSetting().actions.add : false;
     this.isActionEdit = this.grid.getSetting().actions ? this.grid.getSetting().actions.edit : false;

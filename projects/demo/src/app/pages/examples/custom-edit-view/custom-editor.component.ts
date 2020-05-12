@@ -23,7 +23,7 @@ import { DefaultEditor } from 'ng2-smart-table';
             (keyup)="updateValue()"
             (keydown.enter)="onEdited.emit($event)"
             (keydown.esc)="onStopEditing.emit()">
-    <div [hidden]="true" [innerHTML]="cell.getValue()" #htmlValue></div>
+    <div [hidden]="true" [innerHTML]="cell.getValue() | sanitizeHtml" #htmlValue></div>
   `,
 })
 export class CustomEditorComponent extends DefaultEditor implements AfterViewInit {

@@ -6,7 +6,6 @@ export class LocalFilter {
 
   static filter(data: any[], field: string, search: string, customFilter?: () => boolean): Array<any> {
     const filter: (value: string, search: string) => boolean = customFilter ? customFilter : filterValues;
-
     return data.filter((el) => {
       const value = !el[field] ? '' : el[field];
       return filter.call(null, value, search);

@@ -1,4 +1,4 @@
-import { FilterOrEditConfigClass } from '../../components/thead/filter/filter.class';
+import { FilterOrEditConfigClass } from '../../../components/thead/rows/filter/filter.class';
 
 export class Column {
 
@@ -25,6 +25,9 @@ export class Column {
     component?: any
   } = { type: 'default', config: new FilterOrEditConfigClass(), component: null };
 
+  editSeparateGrid?: { index?: number, width: string } = { index: 9999, width: '100%' };
+  createSeparateGrid?: { index?: number, width: string } = { index: 9999, width: '100%' };
+
   renderComponent?: any = null;
 
   compareFunction?: (...attr) => number = null;
@@ -38,29 +41,29 @@ export class Column {
 
   getOnComponentInitFunction ? = (...attr) => {
     return this.onComponentInitFunction;
-  }
+  };
 
   getCompareFunction ? = () => {
     return this.compareFunction;
-  }
+  };
 
   getValuePrepareFunction ? = () => {
     return this.valuePrepareFunction;
-  }
+  };
 
   getFilterFunction ? = () => {
     return this.filterFunction;
-  }
+  };
 
   getConfig ? = () => {
     return this.editor && this.editor.config;
-  }
+  };
 
   getFilterType  ? = () => {
     return this.filter ? this.filter.type : 'default';
-  }
+  };
 
   getFilterConfig ? = () => {
     return this.filter ? this.filter.config : new FilterOrEditConfigClass();
-  }
+  };
 }

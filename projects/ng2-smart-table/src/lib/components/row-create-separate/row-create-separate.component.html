@@ -1,0 +1,24 @@
+<div *ngIf="creatingRow && grid.getSetting().editSeparate"
+     [ngStyle]="{
+     display:'flex'
+     ,flexWrap:'wrap'
+     , justifyContent:'space-between'}"
+     class="ng2-smart-separate-create">
+	<div *ngFor="let cell of sortedCells"
+	     [style.flex]="'0 0 calc('+cell.getColumn().createSeparateGrid.width+')'"
+	     class="ng2-smart-separate-create-cells">
+		<div [ngClass]="'ng2-smart-separate-create'+cell.getTitle()"
+		     class="ng2-smart-separate-title">{{cell.getTitle()}}:
+		</div>
+		<div [ngClass]="'ng2-smart-separate-create-cell-'+cell.getTitle()"
+		     class="ng2-smart-separate-create-cell">
+			<table-cell-edit-mode [cell]="cell"
+			                      [inputClass]="inputClass"
+			>
+			</table-cell-edit-mode>
+		</div>
+	</div>
+	<ng2-st-actions (create)="onCreate($event)"
+	                (finishEditRowCreating)="onFinishEditRowCreating()"
+	                [grid]="grid"></ng2-st-actions>
+</div>

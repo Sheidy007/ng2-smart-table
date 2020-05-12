@@ -62,20 +62,18 @@ export class FilterSourceClass {
   }
 
   filter(data: any[]): any[] {
+    this.filterConf.filters = this.filterConf.filters.filter(f => f.search && f.field);
     if (!this.filterConf.filters || !this.filterConf.filters.length) {
       return data;
     }
-
     let mergedData: any = [];
     this.filterConf.filters.forEach((fieldConf) => {
-      if (fieldConf.search.length && fieldConf.field.length) {
-        if (this.filterConf.andOperator) {
-          data = LocalFilter
-            .filter(data, fieldConf.field, fieldConf.search, fieldConf.filter);
-        } else {
-          mergedData = [...new Set([...mergedData, ...LocalFilter
-            .filter(data, fieldConf.field, fieldConf.search, fieldConf.filter)])];
-        }
+      if (this.filterConf.andOperator) {
+        data = LocalFilter
+          .filter(data, fieldConf.field, fieldConf.search, fieldConf.filter);
+      } else {
+        mergedData = [...new Set([...mergedData, ...LocalFilter
+          .filter(data, fieldConf.field, fieldConf.search, fieldConf.filter)])];
       }
     });
 

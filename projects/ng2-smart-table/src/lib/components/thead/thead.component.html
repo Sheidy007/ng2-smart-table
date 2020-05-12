@@ -15,7 +15,9 @@
 	       (create)="create.emit($event)"
 	       (filter)="filter.emit($event)">
 	</thead>
-	<thead ng2-st-thead-form-row *ngIf="grid.createFormShown"
+	<thead ng2-st-thead-form-row
+	       *ngIf="grid.createFormShown"
+	       (finishEditRowCreating)="finishEditRowCreating.emit()"
 	       [grid]="grid"
 	       [createConfirm]="createConfirm">
 	</thead>

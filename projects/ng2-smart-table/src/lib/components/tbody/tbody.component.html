@@ -21,7 +21,7 @@
 						       class="form-control"
 						       type="checkbox">
 					</td>
-					<td *ngIf="!row.isInEditing && showActionColumnLeft"
+					<td *ngIf="!row.editing && showActionColumnLeft"
 					    [ngStyle]="{width : grid.widthActions}"
 					    class="ng2-smart-actions">
 						<div #actionsLeft [style.width]="'fit-content'">
@@ -32,9 +32,7 @@
 							                     [style.whiteSpace]="'nowrap'"></ng2-st-tbody-custom>
 							<ng2-st-tbody-edit-delete [grid]="grid"
 							                          [deleteConfirm]="deleteConfirm"
-							                          [editConfirm]="editConfirm"
-							                          (edit)="edit.emit(row)"
-							                          (delete)="delete.emit(row)"
+							                          [saveUpdateConfirm]="saveUpdateConfirm"
 							                          (editRowSelect)="editRowSelect.emit($event)"
 							                          [row]="row"
 							                          [source]="source"
@@ -43,13 +41,16 @@
 						</div>
 					</td>
 					<td
-							*ngIf="row.isInEditing && showActionColumnLeft"
+							*ngIf="row.editing && showActionColumnLeft"
 							[ngStyle]="{width : grid.widthActions}"
 							class="ng2-smart-actions">
-						<div #actionsUpdate [style.width]="'fit-content'">
-							<ng2-st-tbody-create-cancel [editConfirm]="editConfirm"
+						<div #actionsUpdate [style.width]="'fit-content'"
+						     *ngIf="!grid.getSetting().editSeparate">
+							<ng2-st-tbody-update-cancel [saveUpdateConfirm]="saveUpdateConfirm"
 							                            [grid]="grid"
-							                            [row]="row"></ng2-st-tbody-create-cancel>
+							                            [row]="row"
+							                            (finishEditRowSelect)="finishEditRowSelect.emit()"
+							></ng2-st-tbody-update-cancel>
 						</div>
 					</td>
 					<td *ngFor="let cell of row.cells"
@@ -58,19 +59,24 @@
 						                      [grid]="grid"
 						                      [row]="row"
 						                      [isNew]="false"
-						                      [mode]="mode"
-						                      [editConfirm]="editConfirm"
+						                      [saveUpdateConfirm]="saveUpdateConfirm"
 						                      [inputClass]="editInputClass"
-						                      [isInEditing]="row.isInEditing">
+						                      [isInEditing]="row.editing">
 						</ng2-smart-table-cell>
 					</td>
-					<td *ngIf="row.isInEditing && showActionColumnRight"
+					<td *ngIf="row.editing && showActionColumnRight"
+					    [ngStyle]="{width : grid.widthActions}"
 					    class="ng2-smart-actions">
-						<ng2-st-tbody-create-cancel [editConfirm]="editConfirm"
-						                            [grid]="grid"
-						                            [row]="row"></ng2-st-tbody-create-cancel>
+						<div #actionsUpdate [style.width]="'fit-content'"
+						     *ngIf="!grid.getSetting().editSeparate">
+							<ng2-st-tbody-update-cancel [saveUpdateConfirm]="saveUpdateConfirm"
+							                            [grid]="grid"
+							                            [row]="row"
+							                            (finishEditRowSelect)="finishEditRowSelect.emit()">
+							</ng2-st-tbody-update-cancel>
+						</div>
 					</td>
-					<td *ngIf="!row.isInEditing && showActionColumnRight"
+					<td *ngIf="!row.editing && showActionColumnRight"
 					    [ngStyle]="{width : grid.widthActions}"
 					    class="ng2-smart-actions">
 						<div #actionsRight [style.width]="'fit-content'">
@@ -80,20 +86,22 @@
 							                     [source]="source"></ng2-st-tbody-custom>
 							<ng2-st-tbody-edit-delete [grid]="grid"
 							                          [deleteConfirm]="deleteConfirm"
-							                          [editConfirm]="editConfirm"
+							                          [saveUpdateConfirm]="saveUpdateConfirm"
 							                          [row]="row"
 							                          [source]="source"
-							                          (edit)="edit.emit(row)"
-							                          (delete)="delete.emit(row)"
 							                          (editRowSelect)="editRowSelect.emit($event)">
 							</ng2-st-tbody-edit-delete>
 						</div>
 					</td>
 					<td *ngIf="showColumnForShowHiddenColumns && grid.getHideColumns().length"
-					    [ngStyle]="{width : grid.widthShowHiddenColumns}"
+					    [ngStyle]="{width : grid.getNoHideColumns().length?grid.widthShowHiddenColumns:'100%'}"
 					    class="ng2-smart-show-hidden-columns">
-						<div #actionShowHiddenColumns [style.width]="'fit-content'" [style.whiteSpace]="'nowrap'"
-						     [innerHTML]="grid.getSetting().showHiddenColumns.clickHtmlObject"
+						<div #actionShowHiddenColumns
+						     [style.width]="'fit-content'"
+						     [style.whiteSpace]="'nowrap'"
+						     [innerHTML]="(row.showHiddenColumns
+						     ?grid.getSetting().showHiddenColumns.clickHtmlObjectHide
+						     :grid.getSetting().showHiddenColumns.clickHtmlObjectShow) | sanitizeHtml"
 						     (click)="showHiddenColumns(row)"></div>
 					</td>
 				</tr>
@@ -104,16 +112,15 @@
 						<table [style.tableLayout]="'auto'">
 							<tr *ngFor="let cell of row.hiddenCells">
 								<td class="ng2-smart-hidden-title">{{cell.getTitle()}}:</td>
-								<td>
+								<td class="ng2-smart-hidden-cell">
 									<ng2-smart-table-cell [style.width]="'100%'"
 									                      [cell]="cell"
 									                      [grid]="grid"
 									                      [row]="row"
 									                      [isNew]="false"
-									                      [mode]="mode"
-									                      [editConfirm]="editConfirm"
+									                      [saveUpdateConfirm]="saveUpdateConfirm"
 									                      [inputClass]="editInputClass"
-									                      [isInEditing]="row.isInEditing">
+									                      [isInEditing]="row.editing">
 									</ng2-smart-table-cell>
 								</td>
 							</tr>

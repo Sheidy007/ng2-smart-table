@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { DefaultFilter } from './default-filter';
 import { takeUntil } from 'rxjs/operators';
@@ -13,7 +13,7 @@ import { takeUntil } from 'rxjs/operators';
 		       class="form-control">
   `
 })
-export class CheckboxFilterComponent extends DefaultFilter implements OnInit {
+export class CheckboxFilterComponent extends DefaultFilter implements OnInit, OnChanges {
 
   inputControl = new FormControl();
   prevData: boolean = null;
@@ -41,6 +41,12 @@ export class CheckboxFilterComponent extends DefaultFilter implements OnInit {
           this.setFilter();
         }
       });
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.query) {
+      this.inputControl.setValue(this.query);
+    }
   }
 
   resetFilter() {

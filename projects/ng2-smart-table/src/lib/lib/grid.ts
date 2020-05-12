@@ -1,8 +1,8 @@
 import { Subject } from 'rxjs';
 import { EventEmitter } from '@angular/core';
 import { Deferred } from './helpers';
-import { Column } from './data-set/column';
-import { Row } from './data-set/row';
+import { Column } from './data-set/column/column';
+import { Row } from './data-set/row/row';
 import { DataSet } from './data-set/data-set';
 import { DataSourceClass, SortClass } from './data-source/data-source.class';
 import { SettingsClass } from './settings.class';
@@ -107,7 +107,7 @@ export class Grid {
   }
 
   edit(row: Row) {
-    row.isInEditing = true;
+    row.editing = true;
   }
 
   create(row: Row, confirmEmitter: EventEmitter<any>) {
@@ -115,15 +115,12 @@ export class Grid {
     const deferred = new Deferred();
     deferred.promise.then((newData) => {
       newData = newData ? newData : row.getNewData();
-      if (deferred.resolve.skipAdd) {
+      this.source.prepend(newData).then(() => {
         this.createFormShown = false;
-      } else {
-        this.source.prepend(newData).then(() => {
-          this.createFormShown = false;
-          this.dataSet.createNewRow();
-        });
-      }
+        this.dataSet.createNewRow();
+      });
     }).catch(() => {
+      this.createFormShown = false;
     });
 
     if (this.settings.add.confirmCreate) {
@@ -138,19 +135,15 @@ export class Grid {
   }
 
   save(row: Row, confirmEmitter: EventEmitter<any>) {
-
     const deferred = new Deferred();
     deferred.promise.then((newData) => {
-
       newData = newData ? newData : row.getNewData();
-      if (deferred.resolve.skipEdit) {
-        row.isInEditing = false;
-      } else {
-        this.source.update(row.getData(), newData).then(() => {
-          row.isInEditing = false;
-        });
-      }
+      this.source.update(row.getData(), newData).then(() => {
+        row.editing = false;
+      });
     }).catch(() => {
+      row.resetNewData();
+      row.editing = false;
     });
 
     if (this.settings.edit.confirmSave) {

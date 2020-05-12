@@ -1,33 +1,37 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 
 import { Grid } from '../../../lib/grid';
-import { Row } from '../../../lib/data-set/row';
+import { Row } from '../../../lib/data-set/row/row';
 
 @Component({
   selector: '[ng2-st-thead-form-row]',
   template: `
-		<tr>
+		<tr *ngIf="!grid.getSetting().createSeparate">
 			<td *ngIf="isMultiSelectVisible"
 			    [ngStyle]="{width : grid.widthMultipleSelectCheckBox}"></td>
 			<td *ngIf="showActionColumnLeft"
 			    [ngStyle]="{width : grid.widthActions}"
 			    class="ng2-smart-actions">
-				<ng2-st-actions [grid]="grid" (create)="onCreate($event)"></ng2-st-actions>
+				<ng2-st-actions (create)="onCreate($event)"
+				                (finishEditRowCreating)="finishEditRowCreating.emit()"
+				                [grid]="grid"></ng2-st-actions>
 			</td>
-			<td *ngFor="let cell of grid.getNewRow().getCells()">
+			<td *ngFor="let cell of grid.getNewRow().cells">
 				<ng2-smart-table-cell [cell]="cell"
 				                      [grid]="grid"
 				                      [isNew]="true"
 				                      [createConfirm]="createConfirm"
 				                      [inputClass]="addInputClass"
-				                      [isInEditing]="grid.getNewRow().isInEditing"
+				                      [isInEditing]="grid.getNewRow().editing"
 				                      (edited)="onCreate($event)">
 				</ng2-smart-table-cell>
 			</td>
 			<td *ngIf="showActionColumnRight"
 			    [ngStyle]="{width : grid.widthActions}"
 			    class="ng2-smart-actions">
-				<ng2-st-actions [grid]="grid" (create)="onCreate($event)"></ng2-st-actions>
+				<ng2-st-actions (create)="onCreate($event)"
+				                (finishEditRowCreating)="finishEditRowCreating.emit()"
+				                [grid]="grid"></ng2-st-actions>
 			</td>
 			<td *ngIf="showColumnForShowHiddenColumns  && grid.getHideColumns().length"
 			    [ngStyle]="{width : grid.widthShowHiddenColumns}">
@@ -42,6 +46,7 @@ export class TheadFormRowComponent implements OnChanges {
   @Input() createConfirm: EventEmitter<any>;
 
   @Output() create = new EventEmitter<any>();
+  @Output() finishEditRowCreating = new EventEmitter<any>();
 
   isMultiSelectVisible: boolean;
   showActionColumnLeft: boolean;

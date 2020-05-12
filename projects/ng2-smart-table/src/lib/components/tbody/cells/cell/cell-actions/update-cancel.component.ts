@@ -1,22 +1,24 @@
-import { Component, Input, EventEmitter, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 
 import { Grid } from '../../../../../lib/grid';
-import { Row } from '../../../../../lib/data-set/row';
+import { Row } from '../../../../../lib/data-set/row/row';
 
 @Component({
-  selector: 'ng2-st-tbody-create-cancel',
+  selector: 'ng2-st-tbody-update-cancel',
   template: `
 		<a href="#" class="ng2-smart-action ng2-smart-action-edit-save"
-		   [innerHTML]="saveButtonContent" (click)="onSave($event)"></a>
+		   [innerHTML]="saveButtonContent | sanitizeHtml" (click)="onSave($event)"></a>
 		<a href="#" class="ng2-smart-action ng2-smart-action-edit-cancel"
-		   [innerHTML]="cancelButtonContent" (click)="onCancelEdit($event)"></a>
+		   [innerHTML]="cancelButtonContent | sanitizeHtml" (click)="onCancelEdit($event)"></a>
   `
 })
 export class TbodyCreateCancelComponent implements OnChanges {
 
   @Input() grid: Grid;
   @Input() row: Row;
-  @Input() editConfirm: EventEmitter<any>;
+  @Input() saveUpdateConfirm: EventEmitter<any>;
+
+  @Output() finishEditRowSelect = new EventEmitter<any>();
 
   cancelButtonContent: string;
   saveButtonContent: string;
@@ -24,15 +26,16 @@ export class TbodyCreateCancelComponent implements OnChanges {
   onSave(event: any) {
     event.preventDefault();
     event.stopPropagation();
-
-    this.grid.save(this.row, this.editConfirm);
+    this.finishEditRowSelect.emit();
+    this.grid.save(this.row, this.saveUpdateConfirm);
   }
 
   onCancelEdit(event: any) {
     event.preventDefault();
     event.stopPropagation();
-
-    this.row.isInEditing = false;
+    this.finishEditRowSelect.emit();
+    this.row.resetNewData();
+    this.row.editing = false;
   }
 
   ngOnChanges() {

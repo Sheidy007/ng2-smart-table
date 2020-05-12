@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { Column } from '../../../../lib/data-set/column';
+import { Column } from '../../../../lib/data-set/column/column';
 import { SettingsClass } from '../../../../lib/settings.class';
 import { LocalDataSource } from '../../../../lib/data-source/local.data-source';
 

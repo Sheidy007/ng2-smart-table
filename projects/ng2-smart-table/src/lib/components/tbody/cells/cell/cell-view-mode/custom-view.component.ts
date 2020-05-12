@@ -1,6 +1,6 @@
 import { Component, ComponentFactoryResolver, Input, OnDestroy, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 
-import { Cell } from '../../../../../lib/data-set/cell';
+import { Cell } from '../../../../../lib/data-set/row/cell/cell';
 import { ViewCell } from './view-cell';
 
 @Component({

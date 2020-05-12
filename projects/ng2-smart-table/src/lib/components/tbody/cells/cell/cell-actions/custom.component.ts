@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { Row } from '../../../../../lib/data-set/row';
+import { Row } from '../../../../../lib/data-set/row/row';
 
 import { Grid } from '../../../../../lib/grid';
 import { CustomActionResultClass } from '../../../../../lib/settings.class';
@@ -10,7 +10,7 @@ import { CustomActionResultClass } from '../../../../../lib/settings.class';
   template: `
 		<a *ngFor="let action of grid.getSetting().actions.custom" href="#"
 		   class="ng2-smart-action ng2-smart-action-custom-custom"
-		   [innerHTML]="action.title"
+		   [innerHTML]="action.title | sanitizeHtml"
 		   (click)="onCustom(action, $event)"></a>
   `
 })

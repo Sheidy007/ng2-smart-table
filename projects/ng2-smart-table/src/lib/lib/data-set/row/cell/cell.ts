@@ -1,6 +1,6 @@
-import { Column } from './column';
-import { DataSet } from './data-set';
-import { Row } from './row';
+import { Column } from '../../column/column';
+import { DataSet } from '../../data-set';
+import { Row } from '../row';
 
 export function prepareValue(value: any) { return value; }
 

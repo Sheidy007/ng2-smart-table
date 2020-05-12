@@ -1,6 +1,6 @@
 import { Input, Output, EventEmitter, OnDestroy, Component } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
-import { Column } from '../../../../lib/data-set/column';
+import { Column } from '../../../../../lib/data-set/column/column';
 
 @Component({
   template: '',

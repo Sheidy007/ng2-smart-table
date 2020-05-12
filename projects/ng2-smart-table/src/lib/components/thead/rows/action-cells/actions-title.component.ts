@@ -1,6 +1,6 @@
 import {Component, Input, AfterViewInit, ElementRef, OnChanges} from '@angular/core';
 
-import { Grid } from '../../../lib/grid';
+import { Grid } from '../../../../lib/grid';
 
 @Component({
   selector: '[ng2-st-actions-title]',

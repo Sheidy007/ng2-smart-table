@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChange } from '@angular/core';
 import { deepExtend } from './lib/helpers';
 import { Grid } from './lib/grid';
-import { Row } from './lib/data-set/row';
+import { Row } from './lib/data-set/row/row';
 import { LocalDataSource } from './lib/data-source/local.data-source';
 import { CustomActionResultClass, SettingsClass } from './lib/settings.class';
 import { Subject } from 'rxjs';
@@ -22,13 +22,16 @@ export class Ng2SmartTableComponent implements OnChanges, OnDestroy {
 
   @Output() rowSelect = new EventEmitter<any>();
   @Output() userRowSelect = new EventEmitter<any>();
-  @Output() delete = new EventEmitter<any>();
-  @Output() edit = new EventEmitter<any>();
-  @Output() create = new EventEmitter<any>();
+
   @Output() custom = new EventEmitter<CustomActionResultClass>();
+
+  @Output() create = new EventEmitter<Row>();
+  @Output() edit = new EventEmitter<Row>();
   @Output() deleteConfirm = new EventEmitter<any>();
-  @Output() editConfirm = new EventEmitter<any>();
+
   @Output() createConfirm = new EventEmitter<any>();
+  @Output() saveUpdateConfirm = new EventEmitter<any>();
+
   @Output() rowHover: EventEmitter<any> = new EventEmitter<any>();
   @Output() gridEmitResult = new EventEmitter<Grid>();
 
@@ -64,7 +67,12 @@ export class Ng2SmartTableComponent implements OnChanges, OnDestroy {
     this.rowClassFunction = this.grid.getSetting().rowClassFunction;
   }
 
+  createRow(row: Row) {
+    this.create.emit(row);
+  }
+
   editRowSelect(row: Row) {
+    this.edit.emit(row);
     if (this.grid.getSetting().selectMode === 'multi') {
       this.onMultipleSelectRow(row);
     } else {
