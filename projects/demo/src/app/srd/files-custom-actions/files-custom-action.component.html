@@ -1,0 +1,14 @@
+<app-file-uploader [disabled]="false"
+                   [addTypeName]="'Добавить вложение'"
+                   [fileTypeLimitation]="[]"
+                   [(files)]="action.preInitResultData"
+                   [loadUrl]="'api/Attachments/UploadFileOnEvent'"
+                   [removeUrl]="'api/Attachments/RemoveFile'"
+                   [server]="serverName"
+                   [loadParams]="fileUploadParams"
+                   [removeParams]="fileRemoveParams"
+                   (uploadResult)="fileUploaded($event)"
+                   (removeResult)="fileRemoved()"
+                   [waitResult]="false"
+                   class="d-block">
+</app-file-uploader>

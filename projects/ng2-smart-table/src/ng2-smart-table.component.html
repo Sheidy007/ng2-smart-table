@@ -1,0 +1,130 @@
+<!--<div *ngIf="source.indexedDBSource"
+     class="loader-to-index-db"
+     style="width: 100%;
+     height: 20px;
+		 display: flex;
+		 flex-wrap: nowrap;
+		 position: relative">
+	<div [style.width]="source.indexedDBSource.loadedRecordsInPc+'%'" style="background-color: #22A9B6"></div>
+	<div style="position: absolute;width: 100%;height: 100%;text-align: center;">{{source.indexedDBSource.loadedRecords}}/{{source.indexedDBSource.allRecords}}</div>
+</div>
+<button (click)="source.indexedDBSource.query('Aanne Graham','nextunique')">Add Index</button>
+{{CountEl}}-->
+<div class="ngx-rt-container">
+	<div class="ngx-rt-main-container"
+	     [ngClass]="[grid &&
+	     ((grid.gridResizeColumnsFunctions.doDrgDrop | async) ||
+	     (grid.gridResizeColumnsFunctions.doColumnsResize | async) ||
+	      grid.gridActionsFunctions.resizingCardWidth ||
+	      grid.gridActionsFunctions.resizingCardHeight)?'user-select-none':'']">
+		<div [ngStyle]="{maxWidth: (100-(grid && grid.someIs(['details', 'quickView'])?
+										(grid.gridActionsFunctions.lastIsDetailView ? settings.detailsWidth : settings.quickViewWidth):0))+'%'}"
+         #mainTable
+		     class="ngx-rt-main-block">
+			<div *ngIf="settings && grid" class="ngx-rt-top-actions-block">
+				<ng-container *ngFor="let action of customTop">
+					<ngx-rt-custom-action *ngIf="!action.data"
+					                      [action]="action"
+					                      [grid]="grid"
+					                      [row]="grid.getNewRow()"
+					                      class="ngx-rt-action">
+					</ngx-rt-custom-action>
+					<ngx-rt-custom-added *ngIf="action.data === grid.getNewRow().getData() &&
+			                                      action.viewType === 'inline'"
+					                     [grid]="grid"
+					                     [row]="grid.getNewRow()"
+					                     [action]="action"
+					                     class="ngx-rt-action">
+					</ngx-rt-custom-added>
+				</ng-container>
+			</div>
+			<div *ngIf="grid"
+			     class="ngx-rt-main-table">
+				<div *ngIf="!grid.settings.hideHeader || !grid.settings.hideSubHeader"
+				     [grid]="grid"
+				     [ngStyle]="{minWidth: settings.minOuterTableWidthStr}"
+				     class="ngx-rt-thead"
+				     ngx-rt-thead>
+					<div class="ngx-rt-slide-resizer-container">
+						<input (ngModelChange)="resizeTable($event)"
+						       [(ngModel)]="grid.settings.innerTableWidthPc"
+						       class="ngx-rt-slide-resizer"
+						       max="300"
+						       min="100"
+						       type="range">
+					</div>
+				</div>
+				<div [grid]="grid"
+				     class="ngx-rt-tbody"
+				     ngx-rt-tbody>
+				</div>
+			</div>
+			<div (changePage)="changePage.emit($event)"
+			     *ngIf="grid && grid.settings.isPagerDisplay"
+			     [grid]="grid"
+			     [source]="source"
+			     class="ngx-rt-pager"
+			     ngx-rt-pager>
+			</div>
+			<div *ngIf="settings && grid" class="ngx-rt-bottom-actions-block">
+				<ng-container *ngFor="let action of customBottom">
+					<ngx-rt-custom-action *ngIf="!action.data"
+					                      [action]="action"
+					                      [grid]="grid"
+					                      [row]="grid.getNewRow()"
+					                      class="ngx-rt-action">
+					</ngx-rt-custom-action>
+					<ngx-rt-custom-added *ngIf="action.data === grid.getNewRow().getData() &&
+			                                      action.viewType === 'inline'"
+					                     [grid]="grid"
+					                     [row]="grid.getNewRow()"
+					                     [action]="action"
+					                     class="ngx-rt-action">
+					</ngx-rt-custom-added>
+				</ng-container>
+			</div>
+		</div>
+		<div (mousedown)="resizeCardWidth($event)"
+		     *ngIf="grid && grid.someIs(['details', 'quickView'])"
+		     [ngStyle]="{width:grid.settings.resizerSize+'px'}"
+		     class="ngx-rt-vertical-resizer">
+		</div>
+		<div #detailPanel
+		     *ngIf="grid"
+		     [ngStyle]="{width: (grid.gridActionsFunctions.lastIsDetailView ? settings.detailsWidth : settings.quickViewWidth)+'%',
+	                   display:grid.someIs(['details', 'quickView'])?'':'none'}"
+		     class="ngx-rt-panel ngx-rt-left-panel">
+			<div *ngIf="grid.someIs(['details', 'quickView'])"
+			     [viewType]="'details'"
+			     [grid]="grid"
+			     class="ngx-rt-close-separate-component"
+			     ngx-rt-close-separate-component>
+			</div>
+			<ng-template #dynamicDetailOrQuickViewTarget></ng-template>
+		</div>
+	</div>
+	<div (click)="grid.gridActionsFunctions.destroyLastComponentOfViewType('modal')"
+	     *ngIf="grid && grid.someIs(['modal'])"
+	     class="ngx-rt-close-area-of-modal-panel"></div>
+	<div *ngIf="grid"
+	     [ngClass]="[grid.someIs(['modal'])?'ngx-rt-panel ngx-rt-modal-panel stop-paren-scroll':'']"
+	     [ngStyle]="{display:grid.someIs(['modal'])?'':'none'}">
+		<div *ngIf="grid.someIs(['modal'])"
+		     [viewType]="'modal'"
+		     [grid]="grid"
+		     class="ngx-rt-close-separate-component"
+		     ngx-rt-close-separate-component>
+		</div>
+		<ng-template #dynamicModalTarget></ng-template>
+	</div>
+	<div (click)="grid.cellMinHtml$.next('')"
+	     *ngIf="grid && grid.cellMinHtml$ | async "
+	     class="ngx-rt-close-area-of-cell-modal-panel"></div>
+	<div *ngIf="grid && grid.cellMinHtml$ | async as minHtml"
+	    class="ngx-rt-cell-full-text-modal-panel stop-paren-scroll">
+		<div [innerHTML]="minHtml | sanitizeHtml"></div>
+	</div>
+	<div *ngIf="grid && (grid.gridActionsFunctions.actionInProcess | async)"
+	     class="ngx-rt-loader-area"></div>
+</div>
+

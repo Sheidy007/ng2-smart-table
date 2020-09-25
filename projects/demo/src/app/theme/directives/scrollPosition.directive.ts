@@ -1,13 +1,16 @@
-import { Directive, Input, Output, EventEmitter, HostListener, OnInit } from '@angular/core';
+import { Directive, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 
 @Directive({
-  selector: '[scrollPosition]',
+  selector: '[scrollPosition]'
 })
 export class ScrollPositionDirective implements OnInit {
 
   @Input() maxHeight: number;
 
-  @Output() scrollChange = new EventEmitter<any>();
+  @Output() scrollChange = new EventEmitter<{
+    scrolled: boolean,
+    offset: number,
+  }>();
 
   private isScrolled: boolean;
 
@@ -22,7 +25,7 @@ export class ScrollPositionDirective implements OnInit {
       this.isScrolled = isScrolled;
       this.scrollChange.emit({
         scrolled: isScrolled,
-        offset: window.scrollY,
+        offset: window.scrollY
       });
     }
   }

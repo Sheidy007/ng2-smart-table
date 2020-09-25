@@ -1,0 +1,20 @@
+<div class="ngx-rt-separate-custom">
+	<div class="ngx-rt-separate-custom-header">
+		<div class="ngx-rt-separate-custom-header-text">
+			{{action.separateHeader(row.getData())}}
+		</div>
+		<ngx-rt-custom-added [action]="action"
+		                     [grid]="grid"
+		                     [position]="'top'"
+		                     [row]="row"
+		                     class="ngx-rt-separate-custom-header-actions">
+		</ngx-rt-custom-added>
+	</div>
+	<ng-template #dynamicInnerComponent></ng-template>
+	<ngx-rt-custom-added [action]="action"
+	                     [grid]="grid"
+	                     [position]="'bottom'"
+	                     [row]="row"
+	                     class="ngx-rt-separate-custom-bottom-actions">
+	</ngx-rt-custom-added>
+</div>

@@ -1,32 +1,30 @@
 import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { DefaultEditor } from 'ng2-smart-table';
+import { DefaultEditorComponent } from 'ng2-smart-table';
 
 @Component({
   template: `
-    Name: <input [ngClass]="inputClass"
-            #name
-            class="form-control short-input"
-            [name]="cell.getId()"
-            [disabled]="!cell.isEditable()"
-            [placeholder]="cell.getTitle()"
-            (click)="onClick.emit($event)"
-            (keyup)="updateValue()"
-            (keydown.enter)="onEdited.emit($event)"
-            (keydown.esc)="onStopEditing.emit()"><br>
-    Url: <input [ngClass]="inputClass"
-            #url
-            class="form-control short-input"
-            [name]="cell.getId()"
-            [disabled]="!cell.isEditable()"
-            [placeholder]="cell.getTitle()"
-            (click)="onClick.emit($event)"
-            (keyup)="updateValue()"
-            (keydown.enter)="onEdited.emit($event)"
-            (keydown.esc)="onStopEditing.emit()">
-    <div [hidden]="true" [innerHTML]="cell.getValue() | sanitizeHtml" #htmlValue></div>
+	  Name: <input #name
+	               class="short-input"
+	               [name]="cell.getId()"
+	               [disabled]="!cell.isEditable()"
+	               [placeholder]="cell.getTitle()"
+	               (click)="editClick.emit($event)"
+	               (keyup)="updateValue()"
+	               (keydown.enter)="edited.emit($event)"
+	               (keydown.esc)="stopEditing.emit()"><br>
+	  Url: <input #url
+	              class="short-input"
+	              [name]="cell.getId()"
+	              [disabled]="!cell.isEditable()"
+	              [placeholder]="cell.getTitle()"
+	              (click)="editClick.emit($event)"
+	              (keyup)="updateValue()"
+	              (keydown.enter)="edited.emit($event)"
+	              (keydown.esc)="stopEditing.emit()">
+	  <div [hidden]="true" [innerHTML]="cell.cellValue.computedValue | async | sanitizeHtml" #htmlValue></div>
   `,
 })
-export class CustomEditorComponent extends DefaultEditor implements AfterViewInit {
+export class CustomEditorComponent extends DefaultEditorComponent implements AfterViewInit {
 
   @ViewChild('name') name: ElementRef;
   @ViewChild('url') url: ElementRef;
@@ -37,7 +35,7 @@ export class CustomEditorComponent extends DefaultEditor implements AfterViewIni
   }
 
   ngAfterViewInit() {
-    if (this.cell.newValue !== '') {
+    if (this.cell.cellValue.editedValue !== '') {
       this.name.nativeElement.value = this.getUrlName();
       this.url.nativeElement.value = this.getUrlHref();
     }
@@ -46,7 +44,7 @@ export class CustomEditorComponent extends DefaultEditor implements AfterViewIni
   updateValue() {
     const href = this.url.nativeElement.value;
     const name = this.name.nativeElement.value;
-    this.cell.newValue = `<a href='${href}'>${name}</a>`;
+    this.cell.cellValue.editedValue = `<a href='${href}'>${name}</a>`;
   }
 
   getUrlName(): string {

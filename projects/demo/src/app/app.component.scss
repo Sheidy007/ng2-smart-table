@@ -1,0 +1,729 @@
+:host {
+  ::ng-deep {
+    @keyframes opacityShow {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes opacityHide {
+      0% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes changeColor {
+      0% {
+      }
+      100% {
+        background: #ecf4fd;
+      }
+    }
+
+    .ngx-rt-container {
+      position: relative;
+      width: 100%;
+      color: #002446;
+      text-shadow: 0.1px 0.1px #002446;
+      font-family: Circe, serif;
+      font-size: 14px;
+      letter-spacing: -0.154px;
+      line-height: 20px;
+
+      .ngx-rt-panel {
+        background-color: #FFFFFF !important;
+
+        > .ngx-rt-close-separate-component > .ngx-rt-close-separate-component-action {
+          position: absolute;
+          top: 16px;
+          right: 18px;
+        }
+      }
+
+      .ngx-rt-sticky-td {
+        position: sticky;
+        z-index: 5;
+
+        > .ngx-rt-action {
+          width: fit-content;
+          white-space: nowrap;
+        }
+      }
+
+      .ngx-rt-cell {
+        > .ngx-rt-cell-view-mode {
+          display: flex;
+          flex-wrap: nowrap;
+          width: 100%;
+          overflow: hidden;
+
+          > .ngx-rt-action,
+          > .ngx-tr-cell-view-default,
+          > .ngx-tr-cell-view-min-default,
+          > .ngx-tr-cell-view-html,
+          > .ngx-tr-cell-view-min-html,
+          > .ngx-tr-cell-view-custom-component,
+          > .ngx-tr-cell-view-min-custom-component {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+          }
+
+          > .ngx-tr-cell-view-min-default,
+          > .ngx-tr-cell-view-min-html,
+          > .ngx-tr-cell-view-min-custom-component {
+            text-decoration-line: underline;
+
+            &:hover {
+              color: #1f53bc;
+              text-decoration-line: underline;
+            }
+          }
+        }
+
+        > .ngx-rt-cell-edit-mode {
+
+        }
+      }
+
+      > .ngx-rt-main-container {
+        display: flex;
+        flex-wrap: nowrap;
+
+        > .ngx-rt-main-block {
+          flex: 1 0 auto;
+
+          > .ngx-rt-main-table {
+            position: relative;
+
+            > .ngx-rt-thead {
+              &:hover {
+                > .ngx-rt-slide-resizer-container {
+                  display: block;
+                  animation: 0.5s ease-out 0s 1 opacityShow;
+                }
+              }
+
+              > .ngx-rt-slide-resizer-container {
+                width: 100%;
+                position: absolute;
+                left: 0;
+                top: -4px;
+                z-index: 7;
+                display: none;
+                animation: 0.3s ease-out 0s 1 opacityHide;
+                overflow: hidden;
+                height: 10px;
+
+                > .ngx-rt-slide-resizer {
+                  -webkit-appearance: none;
+                  width: 100%;
+                  height: 10px;
+                  background: #dbdbdb;
+                  outline: none;
+                  border-radius: 5px;
+
+                  &::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 10px;
+                    height: 10px;
+                    background: #575757;
+                    border-radius: 4px;
+                    cursor: pointer;
+                  }
+                }
+              }
+
+              > .ngx-rt-head-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+                border: 1px solid #EAECF1;
+                border-radius: 8px 8px 0 0;
+                font-size: 12px;
+                line-height: 18px;
+
+                > .ngx-rt-head-table-container {
+                  border-radius: 8px 8px 0 0;
+
+                  > .ngx-rt-head-table {
+                    > .ngx-rt-head-titles-row {
+                      > tr.ngx-rt-titles {
+                        height: 28px;
+
+                        > td {
+                          border-bottom: 1px solid #EAECF1;
+                          background-color: #FFFFFF;
+
+                          &:first-child {
+                            > * {
+                              padding-left: 23px !important;
+                            }
+                          }
+
+                          &.ngx-rt-sticky-td {
+                            > .ngx-rt-action {
+                              padding-top: 6px;
+                              padding-left: 8px;
+
+                              > .ngx-rt-checkbox-select-container {
+
+                              }
+                            }
+
+                            > .ngx-rt-actions-title {
+
+                            }
+                          }
+
+                          &.ngx-rt-title-td {
+                            min-width: 100px;
+
+                            > .ngx-rt-title {
+                              white-space: nowrap;
+                              overflow: hidden;
+                              text-overflow: ellipsis;
+                              position: relative;
+                              padding-left: 8px;
+                              padding-top: 6px;
+
+                              &:hover > .ngx-rt-handle > .ngx-rt-resize-handle,
+                              &:hover > .ngx-rt-handle > .ngx-rt-anchor-handle,
+                              > .ngx-rt-handle > .ngx-rt-resize-handle-hover {
+                                visibility: visible !important;
+                                animation: 0.5s ease-out 0s 1 opacityShow !important;
+                              }
+
+
+                              &:hover {
+                                > a {
+                                  color: #8490A0;
+                                  text-shadow: 0.1px 0.1px #8490A0;
+                                }
+                              }
+
+                              > a {
+                                text-decoration: none;
+                                color: #8490A0;
+                              }
+
+                              > .ngx-rt-handle {
+                                position: absolute;
+                                display: flex;
+                                flex-wrap: nowrap;
+                                align-items: flex-start;
+                                top: 0;
+                                right: 0;
+                                bottom: 0;
+                                z-index: 2;
+                                visibility: visible !important;
+                                padding-top: 6px;
+
+                                > .ngx-rt-resize-handle {
+                                  height: 100%;
+                                  width: 16px !important;
+                                  border-left: 8px solid white !important;
+                                  cursor: col-resize;
+                                  background-color: black;
+                                  visibility: hidden;
+                                  animation: 0.3s ease-out 0s 1 opacityHide;
+                                }
+
+                                > .ngx-rt-anchor-handle {
+                                  visibility: hidden;
+                                }
+                              }
+                            }
+                          }
+
+                          > .ngx-rt-action, > .ngx-rt-title {
+                          }
+                        }
+                      }
+                    }
+
+                    > .ngx-rt-head-filters-row {
+                      > tr.ngx-rt-filters {
+                        height: 28px;
+
+                        > td {
+                          border-top: 1px solid #EAECF1;
+                          border-bottom: 1px solid #EAECF1;
+                          background-color: #FFFFFF;
+
+                          &:first-child {
+                            padding-left: 23px !important;
+                          }
+
+                          &.ngx-rt-filter-td {
+                            padding: 4px 8px;
+                          }
+
+                          > .ngx-rt-action, > .ngx-rt-filter {
+                          }
+                        }
+                      }
+                    }
+
+                    > .ngx-rt-head-sum-row {
+                      > tr.ngx-rt-sum-row {
+                        height: 28px;
+
+                        > td {
+                          border-top: 1px solid #EAECF1;
+                          border-bottom: 1px solid #EAECF1;
+                          background-color: #FFFFFF;
+
+                          &:first-child {
+                            padding-left: 23px !important;
+                          }
+
+                          &.ngx-rt-sum-cell {
+                            padding-right: 8px;
+                            padding-left: 8px;
+                          }
+                        }
+                      }
+                    }
+
+                    > .ngx-rt-head-create-row {
+                      > tr.ngx-rt-create-row {
+
+                        height: 28px;
+
+                        > td {
+                          border-top: 1px solid #EAECF1;
+                          border-bottom: 1px solid #EAECF1;
+                          background-color: #FFFFFF;
+
+                          &:first-child {
+                            padding-left: 23px !important;
+
+                            > .ngx-rt-add-create-cancel, > .ngx-rt-cell-edit-mode {
+                            }
+                          }
+
+                          &.ngx-rt-cell {
+                            padding-right: 8px;
+                            padding-left: 8px;
+                          }
+
+                          &.ngx-rt-create-row-td {
+                            > .ngx-rt-add-create-cancel {
+
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            > .ngx-rt-tbody {
+              position: relative;
+              border-left: 1px solid #EAECF1;
+              border-right: 1px solid #EAECF1;
+
+              > .ngx-rt-first-page {
+                box-shadow: inset 0px -1px 0px rgba(234, 236, 241, 0.5);
+                border: none !important;
+                z-index: 1;
+
+                > .ngx-rt-first-page-number {
+                  padding-left: 10px;
+                  font-style: italic;
+                }
+              }
+
+              > .ngx-rt-virtual-scroller {
+                width: 100%;
+
+                > .ngx-rt-scrollable-content {
+                  > table {
+                    z-index: 1;
+
+                    > tbody {
+                      > tr {
+                        cursor: pointer;
+
+                        > td {
+                          border-top: 1px solid #EAECF1;
+                          border-bottom: 1px solid #EAECF1;
+                        }
+
+                        &.ngx-rt-system-row {
+                          visibility: hidden;
+
+                          > .ngx-rt-scrolling-background {
+                            width: 15px;
+                            position: sticky;
+                            right: 0;
+                            z-index: 3;
+                          }
+                        }
+
+
+                        &.ngx-tr-show-action {
+                          > td {
+                            background: #dadae0;
+                          }
+                        }
+
+                        &.ngx-rt-main-row {
+                          &:nth-of-type(2n) {
+                            > td {
+                              background: #F6F7F9;
+                            }
+                          }
+
+                          &:nth-of-type(2n+1) {
+                            > td {
+                              background: #FFFFFF;
+                            }
+                          }
+
+                          &:hover {
+                            > td {
+                              animation: 0.5s ease-out 0s 1 changeColor;
+                              background: #ecf4fd !important;
+                            }
+                          }
+
+                          &.error {
+                            &:nth-of-type(2n) {
+                              > td {
+                                background: #fce6e6;
+                              }
+                            }
+
+                            &:nth-of-type(2n+1) {
+                              > td {
+                                background: #fceeee;
+                              }
+                            }
+                          }
+
+                          &.warning {
+                            > td {
+                              background: #fcf4e6;
+                            }
+                          }
+
+                          &.success {
+                            > td {
+                              background: #e6fceb;
+                            }
+                          }
+
+                          > td {
+                            &:first-child {
+                              > * {
+                                padding-left: 23px !important;
+                              }
+                            }
+                          }
+
+                          > .ngx-rt-multiple-select-left, > .ngx-rt-multiple-select-right {
+                            > .ngx-rt-checkbox-select {
+                              padding-right: 8px;
+                              padding-left: 8px;
+                            }
+                          }
+
+                          > .ngx-rt-inline-actions-left, > .ngx-rt-inline-actions-right {
+                            > .ngx-rt-inline-actions {
+                              width: fit-content;
+                              padding-right: 8px;
+                              padding-left: 8px;
+
+                              > .ngx-rt-inline-actions-idle, > .ngx-rt-inline-actions-active {
+                                display: flex;
+                                align-items: center;
+                                flex-wrap: nowrap;
+
+                                > .ngx-rt-action {
+                                  white-space: nowrap;
+                                  overflow: hidden;
+                                  text-overflow: ellipsis
+                                }
+                              }
+                            }
+                          }
+
+                          > .ngx-rt-cell {
+                            > * {
+                              padding-right: 8px;
+                              padding-left: 8px;
+                            }
+
+                            > .ngx-rt-cell-view-mode {
+                            }
+                          }
+                        }
+                      }
+
+                      > .ngx-rt-table-page {
+                        > .ngx-rt-table-page-number {
+                          padding-left: 10px !important;
+                          border-bottom: solid 1px #EAECF1 !important;
+                          position: sticky;
+                          left: 0;
+                          z-index: 3;
+                          font-style: italic;
+                        }
+
+                        > .ngx-rt-table-page-other {
+                          border-bottom: solid 1px #EAECF1 !important;
+                        }
+                      }
+
+                      > tr.ngx-tr-zero-row {
+                        > .ngx-tr-zero-row-content {
+
+                        }
+                      }
+
+                      > tr.ngx-rt-bottom-panel-row {
+                        > .ngx-rt-bottom-panel-column {
+                          position: sticky;
+                          left: 0;
+                          bottom: 0;
+                          z-index: 5;
+
+                          > .ngx-rt-horizontal-resizer {
+                            background-color: black;
+                            cursor: row-resize;
+                          }
+
+                          > .ngx-rt-expand-row-panel {
+                            animation: 0.3s ease-out 0s 1 slideInFromDown2;
+                            overflow: auto;
+                            position: relative;
+
+                            > .ngx-rt-close-separate-component > .ngx-rt-close-separate-component-action {
+
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            > .ngx-rt-pager {
+
+            }
+          }
+        }
+
+        > .ngx-rt-vertical-resizer {
+          background-color: #FFFFFF !important;
+          width: 10px !important;
+          cursor: col-resize;
+          position: relative;
+          z-index: 2;
+        }
+
+        > .ngx-rt-left-panel {
+          overflow: auto;
+          animation: 0.2s ease-out 0s 1 slideLeftFromRight;
+          border: 1px solid #EAECF1;
+          border-radius: 8px 8px 0 0;
+          padding-left: 10px;
+          padding-right: 10px;
+          padding-bottom: 30px;
+
+          > .ngx-rt-close-separate-component > .ngx-rt-close-separate-component-action {
+
+          }
+        }
+      }
+
+      > .ngx-rt-close-area-of-modal-panel {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        opacity: 0.5;
+        z-index: 6;
+      }
+
+      > .ngx-rt-modal-panel {
+        animation: 0.3s ease-out 0s 1 slideInFromDown;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-bottom: 10px;
+        background-color: transparent !important;
+
+        > .ngx-rt-close-separate-component > .ngx-rt-close-separate-component-action {
+
+        }
+      }
+
+      ng2-smart-row-custom-separate {
+        animation: 0.3s ease-out 0s 1 sizeIn;
+        background-color: white;
+
+        > .ngx-rt-separate-custom {
+          > .ngx-rt-separate-custom-header {
+            height: 64px;
+            padding: 14px 50px 10px 20px;
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            white-space: nowrap;
+
+            > .ngx-rt-separate-custom-header-text {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              font-weight: bold;
+              font-size: 20px;
+              line-height: 24px;
+              letter-spacing: 0.340402px;
+            }
+
+            > .ngx-rt-separate-custom-header-actions {
+
+            }
+          }
+
+          > .ngx-rt-separate-custom-bottom-actions {
+
+          }
+        }
+      }
+
+      .ngx-rt-show-separate {
+        background-color: white;
+
+        > .ngx-rt-show-separate-header {
+          height: 64px;
+          padding: 14px 50px 10px 20px;
+          display: flex;
+          flex-wrap: nowrap;
+          justify-content: space-between;
+
+          > .ngx-rt-show-separate-header-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: bold;
+            font-size: 20px;
+            line-height: 24px;
+            letter-spacing: 0.340402px;
+          }
+        }
+
+        > .ngx-rt-separate-cells, > div > .ngx-rt-separate-cells {
+          width: 100%;
+
+          > .ngx-rt-separate-title {
+            color: #8490A0;
+            text-shadow: 0.1px 0.1px #8490A0;
+            padding: 6px 14px;
+          }
+
+          > .ngx-rt-separate-value {
+            padding: 6px 14px;
+
+            > .ngx-rt-cell-view-mode {
+              width: 100%;
+            }
+          }
+        }
+      }
+
+      .ngx-rt-edit-separate {
+        background-color: white;
+
+        > .ngx-rt-edit-separate-header {
+          height: 64px;
+          padding: 14px 50px 10px 20px;
+          display: flex;
+          flex-wrap: nowrap;
+          justify-content: space-between;
+
+          > .ngx-rt-edit-separate-header-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: bold;
+            font-size: 20px;
+            line-height: 24px;
+            letter-spacing: 0.340402px;
+          }
+        }
+
+        > .ngx-rt-separate-cells, > div > .ngx-rt-separate-cells {
+          width: 100%;
+
+          > .ngx-rt-separate-value {
+            padding: 6px 14px;
+
+            > .ngx-rt-cell-edit-mode {
+              width: 100%;
+
+              .ngx-rt-input-editor {
+                display: block;
+                position: relative;
+
+                > .ngx-rt-input:focus ~ .ngx-rt-input-label,
+                > .ngx-rt-input:not(:focus):valid ~ .ngx-rt-input-label {
+                  top: 8px;
+                  left: 0;
+                  padding: 2px;
+                  font-size: 11px;
+                  opacity: 0.5;
+                }
+
+                > .ngx-rt-input {
+                  font-size: 14px;
+                  height: 35px;
+                  padding-top: 8px;
+                  input {
+                    border-width: 1px;
+                    border-radius: 4px;
+                    border-style: solid;
+                  }
+                }
+
+                > .ngx-rt-input-label {
+                  position: absolute;
+                  pointer-events: none;
+                  left: 0;
+                  padding: 2px;
+                  top: 50%;
+                  transform: translate(0, -50%);
+                  width: 100%;
+                  white-space: nowrap;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  transition: 0.2s ease all;
+                  opacity: 0.5;
+                  display: block!important;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+

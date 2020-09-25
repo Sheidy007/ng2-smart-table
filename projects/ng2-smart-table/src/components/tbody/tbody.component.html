@@ -1,0 +1,211 @@
+<div *ngIf="grid.settings.isPagerDisplay
+						&& shouldShowPage()
+						&& (grid.dataSet.viewPortItems | async)"
+     class="ngx-rt-first-page">
+	<div *ngIf="(grid.dataSet.viewPortItems | async).length"
+	     class="ngx-rt-first-page-number">
+		{{startIndexWithBuffer === 0 ? '1.' : (pageTop | async) + '.'}}
+	</div>
+	<div *ngIf="!(grid.dataSet.viewPortItems | async)"
+	     class="ngx-rt-first-page-number">0.
+	</div>
+</div>
+<virtual-scroller #perfectScrollbar="ngxPerfectScrollbar"
+                  #virtualScrollViewport
+                  (resized)="viewportResize()"
+                  (scroll)="onScrollHorizontal($event)"
+                  [bufferAmount]="grid.settings.bufferVirtualScrollCount"
+                  [childrenClass]="'ngx-rt-main-row'"
+                  [ngStyle]="{minHeight: grid.settings.innerTableHeightPx + 'px'}"
+                  [perfectScrollbar]="{
+																wheelSpeed: 0.2,
+															  minScrollbarLength: 20,
+															  wheelPropagation: false
+															}"
+                  [scrollDebounceTime]="100"
+                  [scrollThrottlingTime]="100"
+                  [stripedTable]="true"
+                  [useMarginInsteadOfTranslate]="true"
+                  resizeObserver
+                  class="ps ngx-rt-virtual-scroller">
+	<table [ngStyle]="{ width: grid.someIs(['quickView'])? grid.gridActionsFunctions.tableWithDetailWidthPc  + '%'
+			                     : grid.someIs(['details']) ?'100%'
+			                     : grid.settings.innerTableWidthPc + '%'}">
+		<tbody>
+		<tr class="ngx-rt-system-row">
+			<td *ngIf="showMultiSelectColumnLeft"
+			    [ngStyle]="{width : (grid.gridResizeColumnsFunctions.widthMultipleSelectCheckBoxColumn | async)+'px'}"
+			></td>
+			<td *ngIf="showActionColumnLeft"
+			    [ngStyle]="{width : (grid.gridResizeColumnsFunctions.widthActionsColumnLeft | async)+'px'}"
+			></td>
+			<ng-container *ngIf="grid.someIs(['details']) && grid.gridActionsFunctions.lastIsDetailView">
+				<td [ngStyle]="{width : '100%'}">
+				</td>
+			</ng-container>
+			<ng-container *ngIf="grid.noOneIs(['details']) || !grid.gridActionsFunctions.lastIsDetailView">
+				<td *ngFor="let column of grid.getNotHiddenColumns()"
+				    [attr.width]="column.width">
+				</td>
+			</ng-container>
+			<td *ngIf="showActionColumnRight"
+			    [ngStyle]="{width : (grid.gridResizeColumnsFunctions.widthActionsColumnRight | async)+'px'}"
+			></td>
+			<td *ngIf="showMultiSelectColumnRight"
+			    [ngStyle]="{width : grid.getNotHiddenColumns().length?(grid.gridResizeColumnsFunctions.widthMultipleSelectCheckBoxColumn | async)+'px':'100%'}"
+			></td>
+			<td class="ngx-rt-scrolling-background"></td>
+		</tr>
+		<ng-container *ngFor="let row of (grid.dataSet.viewPortItems | async); trackBy: trackByFn; let i = index">
+			<tr (click)="showMultiSelectColumnLeft || showMultiSelectColumnRight || grid.reverseRowSelectedFlag(row)"
+			    (mousedown)="mousedownRow = row"
+			    (mouseover)="grid.gridEvents.rowHover.next(row.getData());"
+			    (dblclick)="grid.gridActionsFunctions.callDblClick(row);mouseDblDownRow = row;"
+			    [grid]="grid"
+			    [hideTrigger]="grid.gridResizeColumnsFunctions.doColumnsResize"
+			    [ngClass]="[row.getData().system_info_777_isSelected?'ngx-rt-row-selected':'',
+			                grid.settings.rowClassFunction(row.getData()),
+			                mousedownRow===row?'ngx-tr-row-mouse-down':'',
+			                mouseDblDownRow===row?'ngx-tr-row-mouse-dbl-down':'',
+			                grid.settings.actions.show && grid.settings.actions.show.data === row.getData()?'ngx-tr-show-action':'',
+			                grid.settings.actions.edit && grid.settings.actions.edit.data === row.getData()?'ngx-tr-edit-action':'',
+			                grid.settings.actions.add && grid.settings.actions.add.data === row.getData()?'ngx-tr-add-action':''
+			                ]"
+			    [ngStyle]="{height: grid.settings.minRowHeightPx + 'px'}"
+			    [parent]="virtualScrollViewport"
+			    [row]="row"
+			    class="ngx-rt-main-row"
+			    rowShow>
+				<!-- MultiSelect Left-->
+				<ng-container *ngIf="row.showContent">
+					<td *ngIf="showMultiSelectColumnLeft"
+					    [ngStyle]="{visibility:  (grid.gridResizeColumnsFunctions.widthMultipleSelectCheckBoxColumn | async)<4?'hidden':''?'hidden':'',
+					                left:0}"
+					    class="ngx-rt-multiple-select-left ngx-rt-sticky-td">
+						<div #multipleSelectCheckBox
+						     [grid]="grid"
+						     [row]="row"
+						     class="ngx-rt-checkbox-select ngx-rt-action"
+						     ngx-rt-checkbox-select>
+						</div>
+					</td>
+					<!-- Actions Left -->
+					<td *ngIf="showActionColumnLeft"
+					    [ngStyle]="{visibility:  (grid.gridResizeColumnsFunctions.widthActionsColumnLeft | async)<4?'hidden':'',
+					                  left: !showMultiSelectColumnLeft?0: (grid.gridResizeColumnsFunctions.widthMultipleSelectCheckBoxColumn | async)+1+'px'}"
+					    class="ngx-rt-inline-actions-left ngx-rt-sticky-td">
+						<div #actionsLeft
+						     (resized)="resizeAction($event, grid.gridResizeColumnsFunctions.widthActionsColumnLeft)"
+						     [grid]="grid"
+						     [position]="'left'"
+						     [row]="row"
+						     class="ngx-rt-inline-actions ngx-rt-action"
+						     ngx-rt-inline-action
+						     resizeObserver>
+						</div>
+					</td>
+					<!-- Main Columns -->
+					<td *ngIf="grid.someIs(['details']) && grid.gridActionsFunctions.lastIsDetailView; else showAll"
+					    [cell]="row.detailCell"
+					    [grid]="grid"
+					    [isInEditing]="grid.settings.actions.edit && grid.settings.actions.edit.data===row.getData()"
+					    [isNew]="false"
+					    [ngStyle]="{ left: ((showMultiSelectColumnLeft?(grid.gridResizeColumnsFunctions.widthMultipleSelectCheckBoxColumn | async) + 1 : 0) +
+                            (showActionColumnLeft ? (grid.gridResizeColumnsFunctions.widthActionsColumnLeft | async) + 1 : 0)) +'px'  }"
+					    class="ngx-rt-cell ngx-rt-sticky-td"
+					    ngx-rt-cell>
+					</td>
+					<ng-template #showAll>
+						<td *ngFor="let cell of row.cells"
+						    [cell]="cell"
+						    [grid]="grid"
+						    [isInEditing]="grid.settings.actions.edit && grid.settings.actions.edit.data===row.getData()"
+						    [isNew]="false"
+						    [ngStyle]="{ position: cell.getColumn().anchor?'sticky':'',
+                      zIndex:cell.getColumn().anchor?6:0,
+                      left: cell.getColumn().anchor?
+                      ((showMultiSelectColumnLeft?(grid.gridResizeColumnsFunctions.widthMultipleSelectCheckBoxColumn | async) + 1 : 0) +
+                       (showActionColumnLeft ? (grid.gridResizeColumnsFunctions.widthActionsColumnLeft | async) + 1 : 0)) +'px' : 0}"
+						    class="ngx-rt-cell"
+						    ngx-rt-cell>
+						</td>
+					</ng-template>
+					<!--	Actions Right-->
+					<td *ngIf="showActionColumnRight"
+					    [ngStyle]="{visibility:  (grid.gridResizeColumnsFunctions.widthActionsColumnRight | async)<4?'hidden':'',
+					                  right: (!showMultiSelectColumnRight ?15:(grid.gridResizeColumnsFunctions.widthMultipleSelectCheckBoxColumn | async)+15)+'px'}"
+					    class="ngx-rt-inline-actions-right ngx-rt-sticky-td">
+						<div #actionsRight
+						     (resized)="resizeAction($event, grid.gridResizeColumnsFunctions.widthActionsColumnRight)"
+						     [grid]="grid"
+						     [position]="'right'"
+						     [row]="row"
+						     class="ngx-rt-inline-actions ngx-rt-action"
+						     ngx-rt-inline-action
+						     resizeObserver>
+						</div>
+					</td>
+					<!-- MultiSelect Right-->
+					<td *ngIf="showMultiSelectColumnRight"
+					    [ngStyle]="{visibility:  (grid.gridResizeColumnsFunctions.widthMultipleSelectCheckBoxColumn | async)<4?'hidden':''?'hidden':'',
+					                right: '15px'}"
+					    class="ngx-rt-multiple-select-right ngx-rt-sticky-td">
+						<div #multipleSelectCheckBox
+						     [grid]="grid"
+						     [row]="row"
+						     class="ngx-rt-checkbox-select ngx-rt-action"
+						     ngx-rt-checkbox-select>
+						</div>
+					</td>
+					<!-- Scroller back-->
+					<td [ngStyle]="{right: 0}"
+					    class="ngx-rt-sticky-td"></td>
+				</ng-container>
+			</tr>
+			<!--Page Row -->
+			<div #pages
+			     *ngIf="grid.settings.isPagerDisplay &&
+					           !((i+startIndexWithBuffer+1)%grid.pagingSource.getPaging().perPage) &&
+					            i+startIndexWithBuffer!==(grid.pagingSource.viewport | async).items.length-1"
+			     class="ngx-rt-table-page">
+				<td class="ngx-rt-table-page-number">
+					{{(i + startIndexWithBuffer + 1) / grid.pagingSource.getPaging().perPage + 1}}.
+				</td>
+				<td class="ngx-rt-table-page-other"
+				    [attr.colspan]="'100'"></td>
+			</div>
+		</ng-container>
+		<!--If Zero Rows -->
+		<tr *ngIf="!grid.dataSet || !(grid.dataSet.viewPortItems | async).length"
+		    class="ngx-tr-zero-row">
+			<td [attr.colspan]="100"
+			    [innerHTML]="noDataMessage | sanitizeHtml"
+			    class="ngx-tr-zero-row-content">
+			</td>
+		</tr>
+		<!-- Bottom Component Row -->
+		<tr [ngStyle]="{display:grid.someIs(['expandRow'])?'':'none'}"
+		    class="ngx-rt-bottom-panel-row">
+			<td class="ngx-rt-bottom-panel-column">
+				<div *ngIf="grid.someIs(['expandRow'])"
+				     (mousedown)="resizeCardHeight($event)"
+				     [ngStyle]="{height:grid.settings.resizerSize+'px',
+				                 width: grid.someIs(['expandRow'])?((grid.pagingSource.viewportWidth | async) - 15)+'px':0}"
+				     class="ngx-rt-horizontal-resizer">
+				</div>
+				<div [ngStyle]="{width: grid.someIs(['expandRow'])?((grid.pagingSource.viewportWidth | async) - 15)+'px':0,
+													height:grid.settings.expandRowHeight * (grid.pagingSource.viewportHeight | async)  / 100+'px'}"
+				     [ngClass]="[grid.someIs(['expandRow'])?'ngx-rt-panel ngx-rt-expand-row-panel':'']">
+					<div *ngIf="grid.someIs(['expandRow'])"
+					     [viewType]="'expandRow'"
+					     [grid]="grid"
+					     class="ngx-rt-close-separate-component"
+					     ngx-rt-close-separate-component>
+					</div>
+					<ng-template #dynamicExpandRowTarget></ng-template>
+				</div>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</virtual-scroller>

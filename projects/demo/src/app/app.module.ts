@@ -11,12 +11,18 @@ import { ScrollPositionDirective } from './theme/directives/scrollPosition.direc
 import { AdvancedExamplesTypesComponent } from './pages/examples/custom-edit-view/advanced-example-types.component';
 import { ButtonViewComponent } from './pages/examples/custom-edit-view/basic-example-button-view.component';
 import { CustomEditorComponent } from './pages/examples/custom-edit-view/custom-editor.component';
-import { CustomFilterComponent } from './pages/examples/custom-edit-view/custom-filter.component';
-import { ColumnShowModule } from '../../../ng2-smart-table/src/lib/components/columns-show/column-show.module';
-import { RowEditSeparateModule } from '../../../ng2-smart-table/src/lib/components/row-edit-separate/row-edit-separate.module';
-import { RowCreateSeparateModule } from '../../../ng2-smart-table/src/lib/components/row-create-separate/row-create-separate.module';
-import { THeadModule } from '../../../ng2-smart-table/src/lib/components/thead/thead.module';
-import { CellModule } from '../../../ng2-smart-table/src/lib/components/tbody/cells/cell/cell.module';
+import { CustomNumberFilterComponent } from './pages/examples/custom-edit-view/custom-number-filter.component';
+import { ColumnShowModule } from '../../../ng2-smart-table/src/components/columns-show/column-show.module';
+import { THeadModule } from '../../../ng2-smart-table/src/components/thead/thead.module';
+import { CellModule } from '../../../ng2-smart-table/src/components/tbody/cells/cell/cell.module';
+import { TestCustomActionComponent } from './srd/test-custom-action/test-custom-action.component';
+import { CustomRenderComponent } from './pages/examples/custom-edit-view/custom-render.component';
+import { SrdExamplesTypesComponent } from './srd/srd-main.component';
+import { FileUploaderComponent } from './srd/file-uploader/file-uploader.component';
+import { NgxAtonBaseLibModule } from 'ngx-aton-base-library';
+import {  PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { FilesCustomActionComponent } from './srd/files-custom-actions/files-custom-action.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -25,25 +31,26 @@ import { CellModule } from '../../../ng2-smart-table/src/lib/components/tbody/ce
     AdvancedExamplesTypesComponent,
     ButtonViewComponent,
     CustomEditorComponent,
-    CustomFilterComponent
+    CustomNumberFilterComponent,
+    CustomRenderComponent,
+    TestCustomActionComponent,
+    SrdExamplesTypesComponent,
+    FileUploaderComponent,
+    FilesCustomActionComponent
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
     RouterModule.forRoot(routes, { useHash: true }),
     Ng2SmartTableModule,
     ReactiveFormsModule,
     ColumnShowModule,
-    RowEditSeparateModule,
-    RowCreateSeparateModule,
     THeadModule,
-    CellModule
-  ],
-  entryComponents: [
-    ButtonViewComponent,
-    CustomEditorComponent,
-    CustomFilterComponent
+    CellModule,
+    NgxAtonBaseLibModule,
+    PerfectScrollbarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

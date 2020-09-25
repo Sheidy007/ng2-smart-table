@@ -1,0 +1,74 @@
+<div class="ngx-rt-create-separate">
+	<div class="ngx-rt-separate-cells"
+	     style="display: grid;
+	            grid-template-columns: repeat(auto-fill, minmax(0, max-content));">
+		<ng-container *ngFor="let cell of cellsMain;let i = index">
+			<div class="ngx-rt-separate-value"
+			     [style.gridColumn]="(cell.getColumn().type==='table'?gridColumnMax:cell.getColumn()[gridType].separateGrid.gridColumnCount*2-1 ) + ' span' "
+			     [style.gridRow]="cell.getColumn()[gridType].separateGrid.gridRowPosition">
+				<div [cell]="cell"
+				     [grid]="grid"
+				     class="ngx-rt-cell-edit-mode"
+				     ngx-rt-cell-edit-mode>
+				</div>
+			</div>
+		</ng-container>
+	</div>
+	<div [ngStyle]="{
+     display:'flex'
+     ,flexDirection:['quickView', 'details'].includes(type)?'column':'row'
+     , justifyContent:'start'}">
+		<ng-container *ngFor="let group of groupedCells;let id = index">
+			<div>
+				<button class="ng2-smart-separate-edit-cell-group" (click)="openIds(id)">{{group.groupName}}</button>
+			</div>
+			<ng-container *ngIf="['quickView', 'details'].includes(type)">
+				<div [ngStyle]="{ display:groupsIds.includes(id)?'flex':'none'
+								     ,flexWrap:'wrap'
+								     ,justifyContent:'space-between'
+								     ,width: '100%'}">
+					<div class="ngx-rt-separate-cells"
+					     style="display: grid;
+	            grid-template-columns: repeat(auto-fill, minmax(0, max-content));">
+						<ng-container *ngFor="let cell of group.cells;let i = index">
+							<div class="ngx-rt-separate-value"
+							     [style.gridColumn]="(cell.getColumn().type==='table'?gridColumnMax:cell.getColumn()[gridType].separateGrid.gridColumnCount*2 ) + ' span' "
+							     [style.gridRow]="cell.getColumn()[gridType].separateGrid.gridRowPosition">
+								<div [cell]="cell"
+								     [grid]="grid"
+								     ngx-rt-cell-edit-mode
+								     class="ngx-rt-cell-edit-mode">
+								</div>
+							</div>
+						</ng-container>
+					</div>
+				</div>
+			</ng-container>
+		</ng-container>
+	</div>
+	<ng-container *ngIf="!['quickView', 'details'].includes(type)">
+		<ng-container *ngFor="let group of groupedCells;let id = index">
+			<div [ngStyle]="{ display:groupsIds.includes(id)?'flex':'none'
+								     ,flexWrap:'wrap'
+								     ,justifyContent:'space-between'
+								     ,width: '100%'}">
+				<div class="ngx-rt-separate-cells"
+				     style="display: grid;
+	            grid-template-columns: repeat(auto-fill, minmax(0, max-content));">
+					<ng-container *ngFor="let cell of group.cells;let i = index">
+						<div class="ngx-rt-separate-value"
+						     [style.gridColumn]="(cell.getColumn().type==='table'?gridColumnMax:cell.getColumn()[gridType].separateGrid.gridColumnCount*2 ) + ' span' "
+						     [style.gridRow]="cell.getColumn()[gridType].separateGrid.gridRowPosition">
+							<div [cell]="cell"
+							     [grid]="grid"
+							     ngx-rt-cell-edit-mode
+							     class="ngx-rt-cell-edit-mode">
+							</div>
+						</div>
+					</ng-container>
+				</div>
+			</div>
+		</ng-container>
+	</ng-container>
+</div>
+<div ngx-rt-add-create-cancel [grid]="grid"></div>

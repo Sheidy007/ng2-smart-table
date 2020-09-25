@@ -53,6 +53,10 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "lodash",
+              "jquery"
+            ],
             "outputPath": "dist/demo",
             "index": "projects/demo/src/index.html",
             "main": "projects/demo/src/main.ts",
@@ -61,13 +65,21 @@
             "aot": true,
             "assets": [
               "projects/demo/src/favicon.ico",
-              "projects/demo/src/assets"
+              "projects/demo/src/assets",
+              "projects/demo/src/web.config"
             ],
             "styles": [
-              "node_modules/highlight.js/styles/dracula.css",
-              "projects/demo/src/app/theme/theme.scss"
+              "projects/demo/src/app/theme/theme.scss",
+              "projects/demo/src/font.scss",
+              "node_modules/perfect-scrollbar/css/perfect-scrollbar.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/@fortawesome/fontawesome-free/css/all.css",
+              "node_modules/@ng-select/ng-select/themes/material.theme.css",
+              "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "node_modules/ngx-aton-base-library/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+            ]
           },
           "configurations": {
             "production": {

@@ -1,0 +1,581 @@
+:host {
+  ::ng-deep {
+
+    * {
+      box-sizing: border-box;
+    }
+
+    table,
+    input:not([type='checkbox']),
+    optgroup,
+    select,
+    textarea {
+      width: 100%;
+    }
+
+    table,
+    input,
+    optgroup,
+    select,
+    textarea {
+      margin: 0;
+    }
+
+    table {
+      table-layout: fixed;
+      border-collapse: collapse;
+      border-spacing: 0;
+
+      td {
+        padding: 0;
+      }
+    }
+
+    .ngx-rt-multi-select {
+      position: relative;
+
+      > .ngx-rt-multi-select-main-block {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+        text-rendering: auto;
+        color: black;
+        background-color: white;
+        border: 1px solid rgb(118, 118, 118);
+        border-image: initial;
+        margin: 0;
+        padding-left: 4px;
+        padding-right: 18px;
+        height: 21px;
+        width: -webkit-fill-available;
+        overflow: hidden;
+
+        > .ngx-rt-multi-select-text {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        > .ngx-rt-multi-select-arrow {
+          position: absolute;
+          right: 9px;
+          top: 50%;
+          width: 0;
+          height: 0;
+          border: solid black;
+          border-width: 0 2px 2px 0;
+          display: inline-block;
+          padding: 2px;
+          transform: rotate(45deg) translate(0, -100%);
+        }
+      }
+
+      > .ngx-rt-multi-select-select-block {
+        min-width: 100%;
+        position: absolute;
+        z-index: 2;
+        left: 0;
+        top: 100%;
+        background-color: white;
+        border: 1px solid rgb(118, 118, 118);
+
+        > .ngx-rt-multi-select-search {
+          width: 100%;
+        }
+
+         .ngx-rt-multi-select-selector {
+          width: 100%;
+          display: flex;
+          flex-wrap: nowrap;
+          align-items: center;
+          cursor: pointer;
+
+          &:hover {
+            background-color: #2196F3;
+            color: white;
+          }
+
+          > .ngx-rt-multi-select-selector-checkbox {
+
+          }
+
+          > .ngx-rt-multi-select-selector-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 100%
+          }
+        }
+      }
+    }
+
+    .user-select-none {
+      pointer-events: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .clear:after {
+      content: '.';
+      display: block;
+      height: 0;
+      clear: both;
+      visibility: hidden;
+    }
+
+    @keyframes sizeIn{
+      0% {
+        opacity: 0;
+        transform: scale(0.7);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes slideInFromDown {
+      0% {
+        opacity: 0;
+        transform: scale(0.7) translate(-50%, -50%);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translate(-50%, -50%);
+      }
+    }
+
+    @keyframes slideInFromDown2 {
+      0% {
+        opacity: 0;
+        height: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideLeftFromRight {
+      0% {
+        opacity: 0;
+        width: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    .ngx-rt-container {
+      position: relative;
+      width: 100%;
+
+      .ngx-rt-panel {
+        background-color: #e9ebec;
+
+        > .ngx-rt-close-separate-component > .ngx-rt-close-separate-component-action {
+          position: absolute;
+        }
+      }
+
+      .ngx-rt-sticky-td {
+        position: sticky;
+        z-index: 5;
+
+        > .ngx-rt-action {
+          width: fit-content;
+          white-space: nowrap;
+        }
+      }
+
+      .ngx-rt-cell {
+        > .ngx-rt-cell-view-mode {
+          display: flex;
+          flex-wrap: nowrap;
+          width: 100%;
+          overflow: hidden;
+
+          > .ngx-rt-action,
+          > .ngx-tr-cell-view-default,
+          > .ngx-tr-cell-view-min-default,
+          > .ngx-tr-cell-view-html,
+          > .ngx-tr-cell-view-min-html,
+          > .ngx-tr-cell-view-custom-component,
+          > .ngx-tr-cell-view-min-custom-component {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+          }
+        }
+
+        > .ngx-rt-cell-edit-mode {
+
+        }
+      }
+
+      .ngx-rt-input-editor {
+        display: block;
+        position: relative;
+
+        > .ngx-rt-input-label {
+          display: none;
+        }
+      }
+
+      > .ngx-rt-main-container {
+        display: flex;
+        flex-wrap: nowrap;
+
+        > .ngx-rt-main-block {
+          flex: 1 0 auto;
+
+          > .ngx-rt-main-table {
+            position: relative;
+
+            > .ngx-rt-thead {
+              &:hover {
+                > .ngx-rt-slide-resizer-container {
+                  display: block;
+                  animation: 0.5s ease-out 0s 1 opacityShow;
+                }
+              }
+
+              > .ngx-rt-slide-resizer-container {
+                width: 100%;
+                position: absolute;
+                left: 0;
+                top: -4px;
+                z-index: 7;
+                display: none;
+                animation: 0.3s ease-out 0s 1 opacityHide;
+                overflow: hidden;
+                height: 10px;
+
+                > .ngx-rt-slide-resizer {
+                  -webkit-appearance: none;
+                  width: 100%;
+                  height: 10px;
+                  background: #dbdbdb;
+                  outline: none;
+
+                  &::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 10px;
+                    height: 10px;
+                    background: #575757;
+                    border-radius: 4px;
+                    cursor: pointer;
+                  }
+                }
+              }
+
+              > .ngx-rt-head-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+
+                > .ngx-rt-head-table-container {
+
+                  > .ngx-rt-slide-resizer-container {
+                    width: 100%;
+                    position: absolute;
+                    left: 0;
+                    top: -4px;
+                    z-index: 7;
+
+                    > .ngx-rt-slide-resizer {
+
+                    }
+                  }
+
+                  > .ngx-rt-head-table {
+                    > .ngx-rt-head-titles-row {
+                      > tr.ngx-rt-titles {
+                        > .ngx-rt-sticky-td {
+                          > .ngx-rt-action {
+                            > .ngx-rt-checkbox-select-container {
+
+                            }
+                          }
+
+                          > .ngx-rt-actions-title {
+
+                          }
+                        }
+
+                        > .ngx-rt-title-td {
+                          min-width: 100px;
+
+                          > .ngx-rt-title {
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            position: relative;
+
+                            > .ngx-rt-handle {
+                              position: absolute;
+                              display: flex;
+                              flex-wrap: nowrap;
+                              align-items: flex-start;
+                              top: 0;
+                              right: 0;
+                              bottom: 0;
+                              z-index: 2;
+                              visibility: visible !important;
+
+                              > .ngx-rt-resize-handle {
+                                height: 100%;
+                                cursor: col-resize;
+                                background-color: black;
+                              }
+
+                              > .ngx-rt-anchor-handle {
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+
+                    > .ngx-rt-head-filters-row {
+                      > tr.ngx-rt-filters {
+                        > .ngx-rt-filter-td {
+
+                        }
+                      }
+                    }
+
+                    > .ngx-rt-head-sum-row {
+                      > tr.ngx-rt-sum-row {
+                        > .ngx-rt-sum-cell {
+
+                        }
+                      }
+                    }
+
+                    > .ngx-rt-head-add-row {
+                      > tr.ngx-rt-add-row {
+                        > .ngx-rt-add-row-td {
+                          left: 0;
+                          width: 0;
+
+                          > .ngx-rt-add-row-content {
+                            text-align: center;
+
+                            > .ngx-rt-add-button {
+                              display: block;
+                              white-space: nowrap;
+                              text-align: center;
+                              width: 100%;
+                            }
+                          }
+                        }
+                      }
+                    }
+
+                    > .ngx-rt-head-create-row {
+                      > tr.ngx-rt-create-row {
+                        > .ngx-rt-create-row-td {
+                          > .ngx-rt-add-create-cancel {
+
+                          }
+                        }
+
+                        > .ngx-rt-cell {
+
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            > .ngx-rt-tbody {
+              position: relative;
+
+              > .ngx-rt-first-page {
+                border-bottom: solid 1px black;
+                z-index: 1;
+
+                > .ngx-rt-first-page-number {
+
+                }
+              }
+
+              > .ngx-rt-virtual-scroller {
+                width: 100%;
+
+                > .ngx-rt-scrollable-content {
+                  > table {
+                    z-index: 1;
+
+                    > tbody {
+                      > tr.ngx-rt-system-row {
+                        visibility: hidden;
+
+                        > .ngx-rt-scrolling-background {
+                          width: 15px;
+                          position: sticky;
+                          right: 0;
+                          z-index: 3;
+                        }
+                      }
+
+                      > tr.ngx-rt-main-row {
+                        > .ngx-rt-multiple-select-left, > .ngx-rt-multiple-select-right {
+                          > .ngx-rt-checkbox-select {
+
+                          }
+                        }
+
+                        > .ngx-rt-inline-actions-left, > .ngx-rt-inline-actions-right {
+                          > .ngx-rt-inline-actions {
+                            > .ngx-rt-inline-actions-idle, > .ngx-rt-inline-actions-active {
+                              width: fit-content;
+                              display: flex;
+                              align-items: center;
+                              flex-wrap: nowrap;
+
+                              > .ngx-rt-action {
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis
+                              }
+                            }
+                          }
+                        }
+
+                        > .ngx-rt-cell {
+                          > .ngx-rt-cell-view-mode {
+                          }
+                        }
+                      }
+
+                      > .ngx-rt-table-page {
+                        display: table-row;
+                        > .ngx-rt-table-page-number {
+                          border-bottom: solid 1px black;
+                          position: sticky;
+                          left: 0;
+                          z-index: 3;
+                        }
+
+                        > .ngx-rt-table-page-other {
+                          border-bottom: solid 1px black;
+                        }
+                      }
+
+                      > tr.ngx-tr-zero-row {
+                        > .ngx-tr-zero-row-content {
+
+                        }
+                      }
+
+                      > tr.ngx-rt-bottom-panel-row {
+                        > .ngx-rt-bottom-panel-column {
+                          position: sticky;
+                          left: 0;
+                          bottom: 0;
+                          z-index: 5;
+
+                          > .ngx-rt-horizontal-resizer {
+                            background-color: black;
+                            cursor: row-resize;
+                          }
+
+                          > .ngx-rt-expand-row-panel {
+                            animation: 0.3s ease-out 0s 1 slideInFromDown2;
+                            overflow: auto;
+                            position: relative;
+
+                            > .ngx-rt-close-separate-component > .ngx-rt-close-separate-component-action {
+
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            > .ngx-rt-pager {
+
+            }
+          }
+        }
+
+        > .ngx-rt-vertical-resizer {
+          background-color: black;
+          cursor: col-resize;
+          position: relative;
+          z-index: 2;
+        }
+
+        > .ngx-rt-left-panel {
+          overflow: auto;
+          animation: 0.2s ease-out 0s 1 slideLeftFromRight;
+
+          > .ngx-rt-close-separate-component > .ngx-rt-close-separate-component-action {
+
+          }
+        }
+      }
+
+      > .ngx-rt-close-area-of-modal-panel, > .ngx-rt-close-area-of-cell-modal-panel {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        opacity: 0.5;
+        z-index: 6;
+      }
+
+      > .ngx-rt-modal-panel, > .ngx-rt-cell-full-text-modal-panel {
+        overflow: auto;
+        display: flex;
+        flex-wrap: nowrap;
+        flex-direction: column;
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        z-index: 6;
+        transform-origin: top center;
+        transform: scale(1) translate(-50%, -50%);
+        background-color: white;
+        > .ngx-rt-close-separate-component > .ngx-rt-close-separate-component-action {
+
+        }
+      }
+      > .ngx-rt-modal-panel{
+        background-color: transparent !important;
+      }
+      >.ngx-rt-cell-full-text-modal-panel{
+        padding: 8px;
+      }
+      > .ngx-rt-loader-area {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #ffffff;
+        opacity: 0.5;
+        z-index: 6;
+        cursor: progress;
+      }
+    }
+  }
+}
+

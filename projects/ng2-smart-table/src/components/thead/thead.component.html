@@ -1,0 +1,40 @@
+<ng-content></ng-content>
+<div [ngStyle]="{height:(headHeight | async)}"></div>
+<div [ngStyle]="{visibility: (headHeight | async) ==='0px'?'hidden':''}"
+     class="ngx-rt-head-container"
+     #mainTableHead>
+	<div (resized)="resize($event)"
+	     class="ngx-rt-head-table-container"
+	     resizeObserver>
+		<table [ngStyle]="{ width: grid.someIs(['quickView'])? grid.gridActionsFunctions.tableWithDetailWidthPc + '%'
+			                     : grid.someIs(['details']) ?'100%'
+			                     : grid.settings.innerTableWidthPc + '%'}"
+		       class="ngx-rt-head-table">
+			<thead *ngIf="!grid.settings.hideHeader"
+			       [grid]="grid"
+			       class="ngx-rt-head-titles-row"
+			       ngx-rt-head-titles-row>
+			</thead>
+			<thead *ngIf="!grid.settings.hideSubHeader"
+			       [grid]="grid"
+			       class="ngx-rt-head-filters-row"
+			       ngx-rt-head-filters-row>
+			</thead>
+			<thead *ngIf="!grid.settings.hideSumRow"
+			       [grid]="grid"
+			       class="ngx-rt-head-sum-row"
+			       ngx-rt-head-sum-row>
+			</thead>
+			<thead *ngIf="grid.settings.actions.add"
+			       [grid]="grid"
+			       class="ngx-rt-head-add-row"
+			       ngx-rt-head-add-row>
+			</thead>
+			<thead *ngIf="grid.settings.actions.add && grid.settings.actions.add.data"
+			       [grid]="grid"
+			       class="ngx-rt-head-create-row"
+			       ngx-rt-head-create-row>
+			</thead>
+		</table>
+	</div>
+</div>

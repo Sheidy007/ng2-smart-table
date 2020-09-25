@@ -1,0 +1,45 @@
+<table class="ng2-smart-table-column-show">
+	<thead>
+	<tr>
+		<th [style.width]="'25%'">Name</th>
+		<th [style.width]="'25%'">IsShow</th>
+		<th [style.width]="'25%'">IsAnchor</th>
+		<th [style.width]="'25%'">Filter</th>
+	</tr>
+	</thead>
+	<tbody (cdkDropListDropped)="drop($event)"
+	       cdkDropList
+	       cdkDropListOrientation="vertical"
+	       class="example-list">
+	<tr *ngFor="let column of grid.getAllColumns()">
+		<td (mousedown)="grid.gridResizeColumnsFunctions.doDrgDrop.next(true)"
+		    (mouseup)="grid.gridResizeColumnsFunctions.doDrgDrop.next(false)"
+		    [cdkDragDisabled]="column.anchor"
+		    cdkDrag>
+			<table [style.width]="'100%'" [style.tableLayout]="'fixed'">
+				<td [ngStyle]="{width:column.width,
+				    backgroundColor:column.show?'green':'transparent',
+				    whiteSpace: 'nowrap'}"
+				>{{column.title}}</td>
+				<td [style.width]="getAnotherWidth(column.width)"></td>
+			</table>
+		</td>
+		<td>
+			<input [(ngModel)]="column.show"
+			       (change)="grid.refreshGrid()"
+			       type="checkbox">
+		</td>
+		<td>
+			<input [(ngModel)]="column.anchor"
+			       (ngModelChange)="grid.anchor($event, column.id)"
+			       class="anchor-handle"
+			       type="checkbox">
+		</td>
+		<td class="ng2-smart-th {{ column.id }}">
+			<ngx-rt-filter [grid]="grid"
+			               [column]="column">
+			</ngx-rt-filter>
+		</td>
+	</tr>
+	</tbody>
+</table>

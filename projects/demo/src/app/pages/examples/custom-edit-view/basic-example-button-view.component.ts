@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ViewCell } from 'ng2-smart-table';
+import { Component, EventEmitter, OnChanges, Output } from '@angular/core';
+import { DefaultViewCellComponent } from 'ng2-smart-table';
 
 @Component({
   selector: 'button-view',
@@ -7,15 +7,11 @@ import { ViewCell } from 'ng2-smart-table';
 		<button (click)="onClick()" style="white-space: nowrap">{{ renderValue }}</button>
   `
 })
-export class ButtonViewComponent implements ViewCell, OnInit {
+export class ButtonViewComponent extends DefaultViewCellComponent implements OnChanges {
   renderValue: string;
-
-  @Input() value: string | number;
-  @Input() rowData: any;
-
   @Output() save: EventEmitter<any> = new EventEmitter();
 
-  ngOnInit() {
+  ngOnChanges() {
     this.renderValue = this.value.toString().toUpperCase();
   }
 
